@@ -1,0 +1,54 @@
+# Environnement virtuel
+venv/
+env/
+ENV/
+.venv/
+.python-version
+
+# Fichiers Python compilés
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Fichiers temporaires de l'éditeur
+*.swp
+*.swo
+*.bak
+*~
+*.tmp
+
+# PyCharm / VSCode / autres IDEs
+.idea/
+.vscode/
+*.code-workspace
+
+# Fichiers et dossiers générés par Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+
+# Paramètres sensibles
+.env
+.env.*
+
+# Migrations (optionnel selon ton organisation)
+*/migrations/__pycache__/
+*/migrations/*.pyc
+*/migrations/*.pyo
+*/migrations/*.log
+# Pour ignorer les fichiers de migration eux-mêmes (à utiliser avec prudence)
+# */migrations/*.py
+
+# Fichiers de test
+.coverage
+htmlcov/
+.coverage.*
+
+# Autres
+.DS_Store
+Thumbs.db

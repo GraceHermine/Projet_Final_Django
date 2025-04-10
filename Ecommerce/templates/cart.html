@@ -45,47 +45,29 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for item in panier_items %}
                                         <tr>
-                                            <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a>
+                                            <td class="product_remove">
+                                                <a href="{% url 'supprimer_item' item.id %}">
+                                                    <i class="fa fa-trash-o"></i>
+                                                </a>
                                             </td>
-                                            <td class="product_thumb"><a href="#"><img
-                                                        src="{% static 'assets/img/s-product/product.jpg' %}" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbag fringilla</a></td>
-                                            <td class="product-price">£65.00</td>
-                                            <td class="product_quantity"><label>Quantity</label> <input min="1"
-                                                    max="100" value="1" type="number"></td>
-                                            <td class="product_total">£130.00</td>
-
-
+                                            <td class="product_thumb">
+                                                <a href="#"><img src="{{ item.produit.image.url }}" alt=""></a>
+                                            </td>
+                                            <td class="product_name"><a href="#">{{ item.produit.nom }}</a></td>
+                                            <td class="product-price">{{ item.produit.prix }} XOF</td>
+                                            <td class="product_quantity">
+                                                <label>Quantity</label>
+                                                <input min="1" max="100" value="{{ item.quantite }}" type="number">
+                                            </td>
+                                            <td class="product_total">{{ item.total }} XOF</td>
                                         </tr>
-
+                                        {% empty %}
                                         <tr>
-                                            <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a>
-                                            </td>
-                                            <td class="product_thumb"><a href="#"><img
-                                                        src="{% static 'assets/img/s-product/product2.jpg' %}" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbags justo</a></td>
-                                            <td class="product-price">£90.00</td>
-                                            <td class="product_quantity"><label>Quantity</label> <input min="1"
-                                                    max="100" value="1" type="number"></td>
-                                            <td class="product_total">£180.00</td>
-
-
+                                            <td colspan="6">Votre panier est vide.</td>
                                         </tr>
-                                        <tr>
-                                            <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a>
-                                            </td>
-                                            <td class="product_thumb"><a href="#"><img
-                                                        src="{% static 'assets/img/s-product/product3.jpg' %}" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbag elit</a></td>
-                                            <td class="product-price">£80.00</td>
-                                            <td class="product_quantity"><label>Quantity</label> <input min="1"
-                                                    max="100" value="1" type="number"></td>
-                                            <td class="product_total">£160.00</td>
-
-
-                                        </tr>
-
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
@@ -114,17 +96,17 @@
                                 <div class="coupon_inner">
                                     <div class="cart_subtotal">
                                         <p>Subtotal</p>
-                                        <p class="cart_amount">£215.00</p>
+                                        <p class="cart_amount">{{ total }} XOF</p>
                                     </div>
                                     <div class="cart_subtotal ">
                                         <p>Shipping</p>
-                                        <p class="cart_amount"><span>Flat Rate:</span> £255.00</p>
+                                        <p class="cart_amount"><span>Flat Rate:</span> 0 XOF</p>
                                     </div>
                                     <a href="#">Calculate shipping</a>
 
                                     <div class="cart_subtotal">
                                         <p>Total</p>
-                                        <p class="cart_amount">£215.00</p>
+                                        <p class="cart_amount">{{ total }} XOF</p>
                                     </div>
                                     <div class="checkout_btn">
                                         <a href="#">Proceed to Checkout</a>

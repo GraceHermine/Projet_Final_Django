@@ -32,25 +32,19 @@
                 <div class="col-lg-6 col-md-6">
                     <div class="account_form">
                         <h2>login</h2>
-                        <form action="#">
+                        <form action="{% url 'login' %}" method="post">
+                            {% csrf_token %}
                             <p>
-                                <label>Username or email <span>*</span></label>
-                                <input type="text">
+                                <label>Email <span>*</span></label>
+                                <input type="text" name="email" required>
                             </p>
                             <p>
-                                <label>Passwords <span>*</span></label>
-                                <input type="password">
+                                <label>Mot de passe <span>*</span></label>
+                                <input type="password" name="password" required>
                             </p>
                             <div class="login_submit">
-                                <a href="#">Lost your password?</a>
-                                <label for="remember">
-                                    <input id="remember" type="checkbox">
-                                    Remember me
-                                </label>
-                                <button type="submit">login</button>
-
+                                <button type="submit">Login</button>
                             </div>
-
                         </form>
                     </div>
                 </div>
@@ -60,14 +54,27 @@
                 <div class="col-lg-6 col-md-6">
                     <div class="account_form register">
                         <h2>Register</h2>
-                        <form action="#">
+                        <form action="{% url 'register' %}" method="post">
+                            {% csrf_token %}
                             <p>
-                                <label>Email address <span>*</span></label>
-                                <input type="text">
+                                <label>Prénom <span>*</span></label>
+                                <input type="text" name="prenom" required>
                             </p>
                             <p>
-                                <label>Passwords <span>*</span></label>
-                                <input type="password">
+                                <label>Nom <span>*</span></label>
+                                <input type="text" name="nom" required>
+                            </p>
+                            <p>
+                                <label>Email <span>*</span></label>
+                                <input type="email" name="email" required>
+                            </p>
+                            <p>
+                                <label>Mot de passe <span>*</span></label>
+                                <input type="password" name="password" required>
+                            </p>
+                            <p>
+                                <label>Confirmer le mot de passe <span>*</span></label>
+                                <input type="password" name="confirm_password" required>
                             </p>
                             <div class="login_submit">
                                 <button type="submit">Register</button>

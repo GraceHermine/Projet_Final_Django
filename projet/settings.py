@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin', 
     'django_ckeditor_5',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -67,6 +68,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'Ecommerce.context_processors.favoris_count',
+                'Ecommerce.context_processors.panier_context',
             ],
         },
     },
@@ -85,6 +88,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'Ecommerce.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -102,6 +106,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    'Ecommerce.auth_backend.EmailBackend',  # remplace "ton_app" par le nom de ton app
 ]
 
 
@@ -227,6 +235,14 @@ CKEDITOR_5_CONFIGS = {
 
 # Define a constant in settings.py to specify file upload permissions
 CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff",   # Possible values: "staff", "authenticated", "any"
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Ma Super Admin",
+    "site_header": "Administration",
+    "site_brand": "Philosshop",
+    "welcome_sign": "Bienvenue sur votre interface d’administration",
+    "copyright": "© 2025 Philosshop",
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

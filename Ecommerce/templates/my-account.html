@@ -15,7 +15,7 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="index.html">home</a></li>
+                            <li><a href="{% url "index" %}">home</a></li>
                             <li>My account</li>
                         </ul>
                     </div>
@@ -40,7 +40,13 @@
                                 <li><a href="#address" data-bs-toggle="tab" class="nav-link">Addresses</a></li>
                                 <li><a href="#account-details" data-bs-toggle="tab" class="nav-link">Account details</a>
                                 </li>
-                                <li><a href="login.html" class="nav-link">logout</a></li>
+                                <li>
+                                    {% if user.is_authenticated %}
+                                    <a href="{% url 'logout' %}" class="nav-link">logout</a>
+                                    {% else %}
+                                    <a href="" class="nav-link">logout</a>
+                                    {% endif %}
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -72,14 +78,14 @@
                                                 <td>May 10, 2022</td>
                                                 <td><span class="success">Completed</span></td>
                                                 <td>$25.00 for 1 item </td>
-                                                <td><a href="cart.html" class="view">view</a></td>
+                                                <td><a href="{% url "cart" %}" class="view">view</a></td>
                                             </tr>
                                             <tr>
                                                 <td>2</td>
                                                 <td>May 10, 2022</td>
                                                 <td>Processing</td>
                                                 <td>$17.00 for 1 item </td>
-                                                <td><a href="cart.html" class="view">view</a></td>
+                                                <td><a href="{% url "cart" %}" class="view">view</a></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -134,39 +140,43 @@
                                 <div class="login">
                                     <div class="login_form_container">
                                         <div class="account_login_form">
-                                            <form action="#">
-                                                <p>Already have an account? <a href="#">Log in instead!</a></p>
+                                            <form method="POST" action="{% url 'profile' %}">
+                                                {% csrf_token %}
+                                                <p>Already have an account? <a href="{% url "login" %}">Log in instead!</a></p>
+                                            
                                                 <div class="input-radio">
-                                                    <span class="custom-radio"><input type="radio" value="1"
-                                                            name="id_gender"> Mr.</span>
-                                                    <span class="custom-radio"><input type="radio" value="1"
-                                                            name="id_gender"> Mrs.</span>
+                                                    <span class="custom-radio">
+                                                        <input type="radio" value="homme" name="gender" {% if user.genre == "homme" %}checked{% endif %}> Mr.
+                                                    </span>
+                                                    <span class="custom-radio">
+                                                        <input type="radio" value="femme" name="gender" {% if user.genre == "femme" %}checked{% endif %}> Mrs.
+                                                    </span>
                                                 </div> <br>
+                                            
                                                 <label>First Name</label>
-                                                <input type="text" name="first-name">
+                                                <input type="text" name="first_name" value="{{ user.prenom }}">
+                                            
                                                 <label>Last Name</label>
-                                                <input type="text" name="last-name">
+                                                <input type="text" name="last_name" value="{{ user.nom }}">
+                                            
                                                 <label>Email</label>
-                                                <input type="text" name="email-name">
-                                                <label>Password</label>
-                                                <input type="password" name="user-password">
+                                                <input type="email" name="email" value="{{ user.email }}">
+                                            
                                                 <label>Birthdate</label>
-                                                <input type="text" placeholder="MM/DD/YYYY" value="" name="birthday">
-                                                <span class="example">
-                                                    (E.g.: 05/31/1970)
-                                                </span>
-                                                <br>
+                                                <input type="date" name="birthday" value="{{ user.datenaiss|date:'Y-m-d' }}">
+                                            
                                                 <span class="custom_checkbox">
-                                                    <input type="checkbox" value="1" name="optin">
+                                                    <input type="checkbox" name="optin" value="1" {% if user.optin %}checked{% endif %}>
                                                     <label>Receive offers from our partners</label>
                                                 </span>
                                                 <br>
                                                 <span class="custom_checkbox">
-                                                    <input type="checkbox" value="1" name="newsletter">
-                                                    <label>Sign up for our newsletter<br><em>You may unsubscribe at any
-                                                            moment. For that purpose, please find our contact info in
-                                                            the legal notice.</em></label>
+                                                    <input type="checkbox" name="newsletter" value="1" {% if user.newsletter %}checked{% endif %}>
+                                                    <label>Sign up for our newsletter<br>
+                                                        <em>You may unsubscribe at any moment...</em>
+                                                    </label>
                                                 </span>
+                                            
                                                 <div class="save_button primary_btn default_button">
                                                     <button type="submit">Save</button>
                                                 </div>

@@ -57,8 +57,20 @@
                         </div>
                         <div class="top_right text-end">
                             <ul>
-                                <li><a href="my-account.html"> My Account </a></li>
-                                <li><a href="checkout.html"> Checkout </a></li>
+                                <li>
+                                    {% if user.is_authenticated %}
+                                        <a href="{% url 'account' %}">Mon compte</a>
+                                    {% else %}
+                                        <a href="{% url 'login' %}?next={% url 'account' %}">Mon compte</a>
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if user.is_authenticated %}
+                                    <a href="{% url "checkout" %}"> Checkout </a>
+                                    {% else %}
+                                        <a href="{% url 'login' %}?next={% url 'checkout' %}">Checkout</a>
+                                    {% endif %}
+                                </li>
                             </ul>
                         </div>
                         <div class="search_container">
@@ -92,72 +104,68 @@
 
                         <div class="middel_right_info">
                             <div class="header_wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
-                                <span class="wishlist_quantity">3</span>
+                                {% if user.is_authenticated %}
+                                <a href="{% url "wishlist" %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                <span class="wishlist_quantity">{{ favoris_count }}</span>
+                                {% else %}
+                                <a href="{% url "login" %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                <span class="wishlist_quantity">0</span>
+                                {% endif %}
                             </div>
                             <div class="mini_cart_wrapper">
-                                <a href="javascript:void(0)"><i class="fa fa-shopping-bag"
-                                        aria-hidden="true"></i>$147.00 <i class="fa fa-angle-down"></i></a>
-                                <span class="cart_quantity">2</span>
-                                <!--mini cart-->
+                                <a href="javascript:void(0)">
+                                    <i class="fa fa-shopping-bag" aria-hidden="true"></i>
+                                    {{ mini_panier_total }} FCFA <i class="fa fa-angle-down"></i>
+                                </a>
+                                <span class="cart_quantity">{{ mini_panier_quantite }}</span>
+                            
                                 <div class="mini_cart">
+                                    {% for item in mini_panier_items %}
                                     <div class="cart_item">
                                         <div class="cart_img">
-                                            <a href="#"><img src="{% static 'assets/img/s-product/product.jpg' %}" alt=""></a>
+                                            <a href="#"><img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}"></a>
                                         </div>
                                         <div class="cart_info">
-                                            <a href="#">Sit voluptatem rhoncus sem lectus</a>
-                                            <p>Qty: 1 X <span> $60.00 </span></p>
+                                            <a href="#">{{ item.produit.nom }}</a>
+                                            <p>Qty: {{ item.quantite }} X <span> {{ item.produit.prix }} FCFA </span></p>
                                         </div>
                                         <div class="cart_remove">
-                                            <a href="#"><i class="ion-android-close"></i></a>
+                                            <a href="{% url 'supprimer_item' item.id %}"><i class="ion-android-close"></i></a>
                                         </div>
                                     </div>
-                                    <div class="cart_item">
-                                        <div class="cart_img">
-                                            <a href="#"><img src="{% static 'assets/img/s-product/product2.jpg' %}" alt=""></a>
-                                        </div>
-                                        <div class="cart_info">
-                                            <a href="#">Natus erro at congue massa commodo</a>
-                                            <p>Qty: 1 X <span> $60.00 </span></p>
-                                        </div>
-                                        <div class="cart_remove">
-                                            <a href="#"><i class="ion-android-close"></i></a>
-                                        </div>
-                                    </div>
+                                    {% empty %}
+                                    <p class="text-center">Votre panier est vide.</p>
+                                    {% endfor %}
+                            
                                     <div class="mini_cart_table">
                                         <div class="cart_total">
                                             <span>Sub total:</span>
-                                            <span class="price">$138.00</span>
+                                            <span class="price">{{ mini_panier_total }} FCFA</span>
                                         </div>
                                         <div class="cart_total mt-10">
-                                            <span>total:</span>
-                                            <span class="price">$138.00</span>
+                                            <span>Total:</span>
+                                            <span class="price">{{ mini_panier_total }} FCFA</span>
                                         </div>
                                     </div>
-
+                            
                                     <div class="mini_cart_footer">
                                         <div class="cart_button">
-                                            <a href="cart.html">View cart</a>
+                                            <a href="{% url 'cart' %}">View cart</a>
                                         </div>
                                         <div class="cart_button">
-                                            <a href="checkout.html">Checkout</a>
+                                            <a href="{% url 'checkout' %}">Checkout</a>
                                         </div>
-
                                     </div>
-
                                 </div>
-                                <!--mini cart end-->
                             </div>
                         </div>
                         <div id="menu" class="text-start ">
                             <ul class="offcanvas_main_menu">
-                                <li class="menu-item-has-children active">
-                                    <a href="{% url 'index' %}">Home</a>
-                                    
+                                <li class="menu-item-has-children {% if request.path == '/' %}active{% endif %}">
+                                    <a href="{% url 'index' %}">Accueil</a>
                                 </li>
-                                <li class="menu-item-has-children">
-                                    <a href="#">Shop</a>
+                                <li class="menu-item-has-children {% if request.path == '/shop/' %}active{% endif %}">
+                                    <a href="{% url 'shop' %}">Shop</a>
                                     <ul class="sub-menu">
                                         <li class="menu-item-has-children">
                                             <a href="{% url 'shop' %}">Shop Layouts</a>
@@ -169,7 +177,7 @@
                                                 <li><a href="cart.html">cart</a></li>
                                                 <li><a href="wishlist.html">Wishlist</a></li>
                                                 <li><a href="checkout.html">Checkout</a></li>
-                                                <li><a href="my-account.html">my account</a></li>
+                                                <li><a href="my-account.html">Mon compte</a></li>
                                                 <li><a href="404.html">Error 404</a></li>
                                             </ul>
                                         </li>
@@ -185,26 +193,36 @@
                                         </li>
                                     </ul>
                                 </li>
-                                <li class="menu-item-has-children">
+                                <li class="menu-item-has-children {% if request.path == '/blog/' %}active{% endif %}">
                                     <a href="{% url 'blog' %}">blog</a>
                                 </li>
-                                <li class="menu-item-has-children">
-                                    <a href="services.html">services</a>
+                                <li class="menu-item-has-children {% if request.path == '/service/' %}active{% endif %}">
+                                    <a href="{% url "service" %}">services</a>
                                     
                                 </li>
                                 
-                                <li class="menu-item-has-children">
-                                    <a href="my-account.html">my account</a>
+                                <li class="menu-item-has-children {% if request.path == '/account/' %}active{% endif %}">
+                                    {% if user.is_authenticated %}
+                                            <a href="{% url 'account' %}">Mon compte</a>
+                                        {% else %}
+                                            <a href="{% url 'login' %}?next={% url 'account' %}">Mon compte</a>
+                                        {% endif %}
                                 </li>
-                                <li class="menu-item-has-children">
+                                <li class="menu-item-has-children {% if request.path == '/about/' %}active{% endif %}">
                                     <a href="{% url 'about' %}">about Us</a>
                                 </li>
-                                <li class="menu-item-has-children">
+                                <li class="menu-item-has-children {% if request.path == '/contact/' %}active{% endif %}">
                                     <a href="{% url 'contact' %}"> Contact Us</a>
                                 </li>
-                                <li>
-                                    <a href="login.html">login</a>
+                                {% if user.is_authenticated %}
+                                <li class="menu-item-has-children {% if request.path == '/account/' %}active{% endif %}">
+                                    <a href="{% url "account" %}">{{user.nom}}</a>
                                 </li>
+                                {% else %}
+                                <li class="menu-item-has-children {% if request.path == '/login/' or request.path == '/register/' %}active{% endif %}">
+                                    <a href="{% url "login" %}">login</a>
+                                </li>
+                                {% endif %}
                             </ul>
                         </div>
 
@@ -239,8 +257,20 @@
                         <div class="col-lg-6 col-md-6">
                             <div class="top_right text-end">
                                 <ul>
-                                    <li><a href="my-account.html"> My Account </a></li>
-                                    <li><a href="checkout.html"> Checkout </a></li>
+                                    <li>
+                                        {% if user.is_authenticated %}
+                                            <a href="{% url 'account' %}">Mon Compte</a>
+                                        {% else %}
+                                            <a href="{% url 'login' %}?next={% url 'account' %}">Mon Compte</a>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        {% if user.is_authenticated %}
+                                        <a href="{% url "checkout" %}"> Checkout </a>
+                                        {% else %}
+                                            <a href="{% url 'login' %}?next={% url 'checkout' %}">Checkout</a>
+                                        {% endif %}
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -289,62 +319,59 @@
                                 </div>
                                 <div class="middel_right_info">
                                     <div class="header_wishlist">
-                                        <a href="wishlist.html"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
-                                        <span class="wishlist_quantity">3</span>
+                                        {% if user.is_authenticated %}
+                                        <a href="{% url 'wishlist' %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                        <span class="wishlist_quantity">{{ favoris_count }}</span>
+                                        {% else %}
+                                        <a href="{% url 'login' %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                        <span class="wishlist_quantity">0</span>
+                                        {% endif %}
                                     </div>
                                     <div class="mini_cart_wrapper">
-                                        <a href="javascript:void(0)"><i class="fa fa-shopping-bag"
-                                                aria-hidden="true"></i>$147.00 <i class="fa fa-angle-down"></i></a>
-                                        <span class="cart_quantity">2</span>
-                                        <!--mini cart-->
+                                        <a href="javascript:void(0)">
+                                            <i class="fa fa-shopping-bag" aria-hidden="true"></i>
+                                            {{ mini_panier_total }} FCFA <i class="fa fa-angle-down"></i>
+                                        </a>
+                                        <span class="cart_quantity">{{ mini_panier_quantite }}</span>
+                                    
                                         <div class="mini_cart">
+                                            {% for item in mini_panier_items %}
                                             <div class="cart_item">
                                                 <div class="cart_img">
-                                                    <a href="#"><img src="{% static 'assets/img/s-product/product.jpg' %}" alt=""></a>
+                                                    <a href="#"><img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}"></a>
                                                 </div>
                                                 <div class="cart_info">
-                                                    <a href="#">Sit voluptatem rhoncus sem lectus</a>
-                                                    <p>Qty: 1 X <span> $60.00 </span></p>
+                                                    <a href="#">{{ item.produit.nom }}</a>
+                                                    <p>Qty: {{ item.quantite }} X <span> {{ item.produit.prix }} FCFA </span></p>
                                                 </div>
                                                 <div class="cart_remove">
-                                                    <a href="#"><i class="ion-android-close"></i></a>
+                                                    <a href="{% url 'supprimer_item' item.id %}"><i class="ion-android-close"></i></a>
                                                 </div>
                                             </div>
-                                            <div class="cart_item">
-                                                <div class="cart_img">
-                                                    <a href="#"><img src="{% static 'assets/img/s-product/product2.jpg' %}" alt=""></a>
-                                                </div>
-                                                <div class="cart_info">
-                                                    <a href="#">Natus erro at congue massa commodo</a>
-                                                    <p>Qty: 1 X <span> $60.00 </span></p>
-                                                </div>
-                                                <div class="cart_remove">
-                                                    <a href="#"><i class="ion-android-close"></i></a>
-                                                </div>
-                                            </div>
+                                            {% empty %}
+                                            <p class="text-center">Votre panier est vide.</p>
+                                            {% endfor %}
+                                    
                                             <div class="mini_cart_table">
                                                 <div class="cart_total">
                                                     <span>Sub total:</span>
-                                                    <span class="price">$138.00</span>
+                                                    <span class="price">{{ mini_panier_total }} FCFA</span>
                                                 </div>
                                                 <div class="cart_total mt-10">
-                                                    <span>total:</span>
-                                                    <span class="price">$138.00</span>
+                                                    <span>Total:</span>
+                                                    <span class="price">{{ mini_panier_total }} FCFA</span>
                                                 </div>
                                             </div>
-
+                                    
                                             <div class="mini_cart_footer">
                                                 <div class="cart_button">
-                                                    <a href="cart.html">View cart</a>
+                                                    <a href="{% url 'cart' %}">View cart</a>
                                                 </div>
                                                 <div class="cart_button">
-                                                    <a href="checkout.html">Checkout</a>
+                                                    <a href="{% url 'checkout' %}">Checkout</a>
                                                 </div>
-
                                             </div>
-
                                         </div>
-                                        <!--mini cart end-->
                                     </div>
                                 </div>
                             </div>
@@ -408,7 +435,7 @@
                                                     <ul class="categorie_sub_menu">
                                                         <li><a href="#">Dining room</a></li>
                                                         <li><a href="#">bedroom</a></li>
-                                                        <li><a href="#"> Home & Office</a></li>
+                                                        <li><a href="#"> Accueil & Office</a></li>
                                                         <li><a href="#">living room</a></li>
                                                     </ul>
                                                 </li>
@@ -491,7 +518,7 @@
                             <div class="main_menu menu_position">
                                 <nav>
                                     <ul>
-                                        <li><a class="active" href="{% url 'index' %}">home</a>
+                                        <li><a class="{% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}">Accueil</a>
                                            
                                         </li>
                                         <li class="mega_items"><a href="{% url 'shop' %}">shop<i
@@ -515,7 +542,7 @@
                                                             <li><a href="cart.html">cart</a></li>
                                                             <li><a href="wishlist.html">Wishlist</a></li>
                                                             <li><a href="checkout.html">Checkout</a></li>
-                                                            <li><a href="my-account.html">my account</a></li>
+                                                            <li><a href="my-account.html">Mon compte</a></li>
                                                             <li><a href="404.html">Error 404</a></li>
                                                         </ul>
                                                     </li>
@@ -548,18 +575,19 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <a href="{% url 'blog' %}">blog</a>
+                                            <a class="{% if request.path == '/blog/' %}active{% endif %}" href="{% url 'blog' %}">blog</a>
                                             
                                         </li>
-                                        <li><a href="services.html">services</a>
+                                       
                                             
                                         </li>
-
-                                        
-
-                                        <li><a href="{% url 'about' %}">about Us</a></li>
-                                        <li><a href="{% url 'contact' %}"> Contact Us</a></li>
-                                        <li><a href="login.html">login</a></li>
+                                        <li><a class="{% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">about Us</a></li>
+                                        <li><a class="{% if request.path == '/contact/' %}active{% endif %}" href="{% url 'contact' %}"> Contact Us</a></li>
+                                        {% if user.is_authenticated %}
+                                        <li><a class="{% if request.path == '/account/' %}active{% endif %}" href="{% url 'account' %}">{{user.nom}}</a></li>
+                                        {% else %}
+                                        <li><a class="{% if request.path == '/login/' or request.path == '/register/' %}active{% endif %}" href="{% url 'login' %}">login</a></li>
+                                        {% endif %}
                                     </ul>
                                 </nav>
                             </div>
@@ -578,7 +606,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-3">
                     <div class="logo">
-                        <a href="{% url 'index' %}"><img src="{% static 'assets/img/logo/logo.png' %}" alt=""></a>
+                        <a  href="{% url 'index' %}"><img src="{% static 'assets/img/logo/logo.png' %}" alt=""></a>
                     </div>
                 </div>
                 <div class="col-lg-9">
@@ -586,10 +614,10 @@
                         <div class="main_menu">
                             <nav>
                                 <ul>
-                                    <li><a href="{% url 'index' %}">home<i class="fa fa-angle-down"></i></a>
+                                    <li><a class="{% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}">Accueil</a>
                                         
                                     </li>
-                                    <li class="mega_items"><a class="active" href="{% url 'shop' %}">shop<i
+                                    <li class="mega_items"><a class="{% if request.path == '/shop/' %}active{% endif %}" href="{% url 'shop' %}">shop<i
                                                 class="fa fa-angle-down"></i></a>
                                         <div class="mega_menu">
                                             <ul class="mega_menu_inner">
@@ -608,7 +636,7 @@
                                                         <li><a href="cart.html">cart</a></li>
                                                         <li><a href="wishlist.html">Wishlist</a></li>
                                                         <li><a href="checkout.html">Checkout</a></li>
-                                                        <li><a href="my-account.html">my account</a></li>
+                                                        <li><a href="my-account.html">Mon compte</a></li>
                                                         <li><a href="404.html">Error 404</a></li>
                                                     </ul>
                                                 </li>
@@ -636,77 +664,77 @@
                                             </ul>
                                         </div>
                                     </li>
-                                    <li><a href="{% url 'blog' %}">blog<i class="fa fa-angle-down"></i></a>
+                                    <li><a class="{% if request.path == '/blog/' %}active{% endif %}" href="{% url 'blog' %}">blog</a>
                                         
                                     </li>
-                                    <li><a href="services.html">services</a></a>
+                                    
                                        
                                     </li>
-                                    <li><a href="login.html">login</a></li>
-
-                                    <li><a href="{% url 'about' %}">about Us</a></li>
-                                    <li><a href="{% url 'contact' %}"> Contact Us</a></li>
+                                    <li><a class="{% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">about Us</a></li>
+                                    <li><a class="{% if request.path == '/contact/' %}active{% endif %}" href="{% url 'contact' %}"> Contact Us</a></li>
+                                    {% if user.is_authenticated %}
+                                    <li><a class="{% if request.path == '/account/' %}active{% endif %}" href="{% url 'account' %}">{{user.nom}}</a></li>
+                                    {% else %}
+                                    <li><a class="{% if request.path == '/login/' or request.path == '/register/' %}active{% endif %}" href="{% url 'login' %}">login</a></li>
+                                    {% endif %}
                                 </ul>
                             </nav>
                         </div>
                         <div class="middel_right_info">
                             <div class="header_wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
-                                <span class="wishlist_quantity">3</span>
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'wishlist' %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                <span class="wishlist_quantity">{{ favoris_count }}</span>
+                                {% else %}
+                                <a href="{% url 'login' %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                <span class="wishlist_quantity">0</span>
+                                {% endif %}
                             </div>
                             <div class="mini_cart_wrapper">
-                                <a href="javascript:void(0)"><i class="fa fa-shopping-bag"
-                                        aria-hidden="true"></i>$147.00 <i class="fa fa-angle-down"></i></a>
-                                <span class="cart_quantity">2</span>
-                                <!--mini cart-->
+                                <a href="javascript:void(0)">
+                                    <i class="fa fa-shopping-bag" aria-hidden="true"></i>
+                                    {{ mini_panier_total }} FCFA <i class="fa fa-angle-down"></i>
+                                </a>
+                                <span class="cart_quantity">{{ mini_panier_quantite }}</span>
+                            
                                 <div class="mini_cart">
+                                    {% for item in mini_panier_items %}
                                     <div class="cart_item">
                                         <div class="cart_img">
-                                            <a href="#"><img src="{% static 'assets/img/s-product/product.jpg' %}" alt=""></a>
+                                            <a href="#"><img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}"></a>
                                         </div>
                                         <div class="cart_info">
-                                            <a href="#">Sit voluptatem rhoncus sem lectus</a>
-                                            <p>Qty: 1 X <span> $60.00 </span></p>
+                                            <a href="#">{{ item.produit.nom }}</a>
+                                            <p>Qty: {{ item.quantite }} X <span> {{ item.produit.prix }} FCFA </span></p>
                                         </div>
                                         <div class="cart_remove">
-                                            <a href="#"><i class="ion-android-close"></i></a>
+                                            <a href="{% url 'supprimer_item' item.id %}"><i class="ion-android-close"></i></a>
                                         </div>
                                     </div>
-                                    <div class="cart_item">
-                                        <div class="cart_img">
-                                            <a href="#"><img src="{% static 'assets/img/s-product/product2.jpg' %}" alt=""></a>
-                                        </div>
-                                        <div class="cart_info">
-                                            <a href="#">Natus erro at congue massa commodo</a>
-                                            <p>Qty: 1 X <span> $60.00 </span></p>
-                                        </div>
-                                        <div class="cart_remove">
-                                            <a href="#"><i class="ion-android-close"></i></a>
-                                        </div>
-                                    </div>
+                                    {% empty %}
+                                    <p class="text-center">Votre panier est vide.</p>
+                                    {% endfor %}
+                            
                                     <div class="mini_cart_table">
                                         <div class="cart_total">
                                             <span>Sub total:</span>
-                                            <span class="price">$138.00</span>
+                                            <span class="price">{{ mini_panier_total }} FCFA</span>
                                         </div>
                                         <div class="cart_total mt-10">
-                                            <span>total:</span>
-                                            <span class="price">$138.00</span>
+                                            <span>Total:</span>
+                                            <span class="price">{{ mini_panier_total }} FCFA</span>
                                         </div>
                                     </div>
-
+                            
                                     <div class="mini_cart_footer">
                                         <div class="cart_button">
-                                            <a href="cart.html">View cart</a>
+                                            <a href="{% url 'cart' %}">View cart</a>
                                         </div>
                                         <div class="cart_button">
-                                            <a href="checkout.html">Checkout</a>
+                                            <a href="{% url 'checkout' %}">Checkout</a>
                                         </div>
-
                                     </div>
-
                                 </div>
-                                <!--mini cart end-->
                             </div>
                         </div>
                     </div>
@@ -749,25 +777,42 @@
                                 <ul>
                                     <li><a href="{% url 'about' %}">About Us</a></li>
                                     <li><a href="{% url 'blog' %}">Delivery Information</a></li>
-                                    <li><a href="contact.html">Privacy Policy</a></li>
-                                    <li><a href="services.html">Terms & Conditions</a></li>
-                                    <li><a href="#">Returns</a></li>
-                                    <li><a href="#">Gift Certificates</a></li>
+                                    <li><a href="{% url 'policy' %}">Privacy Policy</a></li>
+                                    <li><a href="{% url 'service' %}">Terms & Conditions</a></li>
+                                    <li><a href="{% url 'faq' %}">Les questions fréquentes</a></li>
+                                    
                                 </ul>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-2 col-md-6 col-sm-6">
                         <div class="widgets_container widget_menu">
-                            <h3>My Account</h3>
+                            <h3>Mon compte</h3>
                             <div class="footer_menu">
                                 <ul>
-                                    <li><a href="#">My Account</a></li>
-                                    <li><a href="#">Order History</a></li>
-                                    <li><a href="wishlist.html">Wish List</a></li>
-                                    <li><a href="#">Newsletter</a></li>
-                                    <li><a href="#">Affiliate</a></li>
-                                    <li><a href="faq.html">International Orders</a></li>
+                                    <li>
+                                        {% if user.is_authenticated %}
+                                            <a href="{% url 'account' %}">Mon compte</a>
+                                        {% else %}
+                                            <a href="{% url 'login' %}?next={% url 'account' %}">Mon compte</a>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        {% if user.is_authenticated %}
+                                            <a href="{% url 'account' %}">Historique</a>
+                                        {% else %}
+                                            <a href="{% url 'login' %}?next={% url 'account' %}">Historique</a>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        {% if user.is_authenticated %}
+                                            <a href="{% url 'wishlist' %}">Wish List</a>
+                                        {% else %}
+                                            <a href="{% url 'login' %}?next={% url 'account' %}">Wish List</a>
+                                        {% endif %}
+                                        
+                                    </li>
+                                    
                                 </ul>
                             </div>
                         </div>
@@ -780,7 +825,7 @@
                                     <li><a class="facebook" href="#" title="Facebook"><i class="fa fa-facebook"></i></a>
                                     </li>
                                     
-                                    <li><a class="instagram" href="#" title="instagram"><i
+                                    <li><a class="instagram" href="https://www.instagram.com/her_mine_g?igsh=MTJuaW8waHJtbzN3Yw==" title="instagram"><i
                                                 class="fa fa-instagram"></i></a></li>
                                     <li><a class="linkedin" href="#" title="linkedin"><i class="fa fa-linkedin"></i></a>
                                     </li>

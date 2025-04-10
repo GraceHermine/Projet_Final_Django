@@ -151,20 +151,40 @@
                 </div>
             </div>
             <div class="product_carousel product_column5 owl-carousel">
+                {% for produit in produits %}
                 <article class="single_product">
                     <figure>
                         <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product1.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product2.jpg' %}" alt=""></a>
+                            <a class="primary_img" href="{% url 'produit' produit.id %}"><img
+                                    src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
+                            <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
+                                    src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
                             <div class="label_product">
                                 <span class="label_sale">sale</span>
                             </div>
                             <div class="action_links">
                                 <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                    {% if user.is_authenticated %}
+                                    {% if produit.id in favoris_ids %}
+                                        <li class="wishlist">
+                                            <a href="{% url 'supprimer_favoris' produit.id %}" title="Retirer des favoris">
+                                                <i class="fa fa-heart" style="color:white;"></i>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="wishlist">
+                                            <a href="{% url 'ajouter_favoris' produit.id %}" title="Ajouter aux favoris">
+                                                <i class="fa fa-heart-o"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% else %}
+                                        <li class="wishlist">
+                                            <a href="{% url 'login' %}" title="Connectez-vous pour ajouter aux favoris">
+                                                <i class="fa fa-heart-o"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
                                     <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
                                     </li>
                                     <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
@@ -172,244 +192,22 @@
                                 </ul>
                             </div>
                             <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
+                                <a href="{% url 'produit' produit.id %}" title="add to cart">Add to cart</a>
                             </div>
                             <div class="product_timing">
-                                <div data-countdown="2023/12/15"></div>
+                                <div data-countdown="2025/12/15"></div>
                             </div>
                         </div>
                         <figcaption class="product_content">
                             <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
+                                <span class="old_price">{{produit.prix}} FCFA</span>
+                                <span class="current_price">{{produit.prix}} FCFA</span>
                             </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Natus erro at congue massa commodo
-                                    sit</a></h3>
+                            <h3 class="product_name"><a href="{% url 'produit' produit.id %}">{{produit.nom}}</a></h3>
                         </figcaption>
                     </figure>
                 </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product3.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product4.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                            <div class="product_timing">
-                                <div data-countdown="2023/12/15"></div>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Itaque earum velit elementum</a>
-                            </h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product5.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product6.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                            <div class="product_timing">
-                                <div data-countdown="2023/12/15"></div>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Mauris tincidunt eros posuere
-                                    placerat</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product7.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product8.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                            <div class="product_timing">
-                                <div data-countdown="2023/12/15"></div>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Morbi ornare vestibulum massa</a>
-                            </h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product9.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product10.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                            <div class="product_timing">
-                                <div data-countdown="2023/12/15"></div>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Porro quisquam eget feugiat
-                                    pretium</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product11.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product12.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                            <div class="product_timing">
-                                <div data-countdown="2023/12/15"></div>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Laudantium enim fringilla
-                                    dignissim ipsum primis</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product4.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product5.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                            <div class="product_timing">
-                                <div data-countdown="2023/12/15"></div>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Natus erro at congue massa commodo
-                                    sit</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
+                {% endfor %}
             </div>
         </div>
     </section>
@@ -541,200 +339,33 @@
                 </div>
             </div>
             <div class="row featured_container featured_column3">
+                {% for produit in produits %}
                 <div class="col-lg-4">
                     <article class="single_product">
                         <figure>
                             <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'blog-detail' %}"><img
-                                        src="{% static 'assets/img/product/product13.jpg' %}" alt=""></a>
-                                <a class="secondary_img" href="{% url 'blog-detail' %}"><img
-                                        src="{% static 'assets/img/product/product14.jpg' %}" alt=""></a>
+                                <a class="primary_img" href="{% url 'produit' produit.id %}"><img
+                                        src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
+                                <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
+                                        src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
                                 <div class="label_product">
                                     <span class="label_sale">sale</span>
                                 </div>
                             </div>
                             <figcaption class="product_content">
                                 <div class="price_box">
-                                    <span class="current_price">$79.00</span>
+                                    <span class="current_price">{{produit.prix}} XOF</span>
                                 </div>
-                                <h3 class="product_name"><a href="{% url 'blog-detail' %}">Pellentesque posuere hendrerit
-                                        dui</a></h3>
+                                <h3 class="product_name"><a href="{% url 'produit' produit.id %}">{{produit.nom}}</a></h3>
                                 <div class="add_to_cart">
-                                    <a href="cart.html" title="add to cart">Add to cart</a>
+                                    <a href="{% url "produit" produit.id %}" title="add to cart">Add to cart</a>
                                 </div>
                             </figcaption>
                         </figure>
                     </article>
                 </div>
-                <div class="col-lg-4">
-                    <article class="single_product">
-                        <figure>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'produit' %}"><img
-                                        src="assets/img/product/product15.jpg" alt=""></a>
-                                <a class="secondary_img" href="{% url 'produit' %}"><img
-                                        src="assets/img/product/product16.jpg" alt=""></a>
-                            </div>
-                            <figcaption class="product_content">
-                                <div class="price_box">
-                                    <span class="old_price">$86.00</span>
-                                    <span class="current_price">$79.00</span>
-                                </div>
-                                <h3 class="product_name"><a href="{% url 'produit' %}">Auctor gravida enim pellentesque
-                                        quam</a></h3>
-                                <div class="add_to_cart">
-                                    <a href="cart.html" title="add to cart">Add to cart</a>
-                                </div>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
-                <div class="col-lg-4">
-                    <article class="single_product">
-                        <figure>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product17.jpg' %}" alt=""></a>
-                                <a class="secondary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product18.jpg' %}" alt=""></a>
-                                <div class="label_product">
-                                    <span class="label_sale">sale</span>
-                                </div>
-                            </div>
-                            <figcaption class="product_content">
-                                <div class="price_box">
-                                    <span class="old_price">$86.00</span>
-                                    <span class="current_price">$79.00</span>
-                                </div>
-                                <h3 class="product_name"><a href="{% url 'produit' %}">Kaoreet lobortis sagittis
-                                        pellentesque</a></h3>
-                                <div class="add_to_cart">
-                                    <a href="cart.html" title="add to cart">Add to cart</a>
-                                </div>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
-                <div class="col-lg-4">
-                    <article class="single_product">
-                        <figure>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product19.jpg' %}" alt=""></a>
-                                <a class="secondary_img" href="{% url 'produit' %}ç"><img
-                                        src="{% static 'assets/img/product/product20.jpg' %}" alt=""></a>
-                                <div class="label_product">
-                                    <span class="label_sale">sale</span>
-                                </div>
-                            </div>
-                            <figcaption class="product_content">
-                                <div class="price_box">
-                                    <span class="old_price">$86.00</span>
-                                    <span class="current_price">$79.00</span>
-                                </div>
-                                <h3 class="product_name"><a href="{% url 'produit' %}">Cras neque honcus consectetur
-                                        magna</a></h3>
-                                <div class="add_to_cart">
-                                    <a href="cart.html" title="add to cart">Add to cart</a>
-                                </div>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
-                <div class="col-lg-4">
-                    <article class="single_product">
-                        <figure>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product21.jpg' %}" alt=""></a>
-                                <a class="secondary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product22.jpg' %}" alt=""></a>
-                            </div>
-                            <figcaption class="product_content">
-                                <div class="price_box">
-                                    <span class="current_price">$79.00</span>
-                                </div>
-                                <h3 class="product_name"><a href="{% url 'produit' %}">Duis pulvinar obortis eleifend
-                                        elementum</a></h3>
-                                <div class="add_to_cart">
-                                    <a href="cart.html" title="add to cart">Add to cart</a>
-                                </div>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
-                <div class="col-lg-4">
-                    <article class="single_product">
-                        <figure>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product23.jpg' %}" alt=""></a>
-                                <a class="secondary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product24.jpg' %}" alt=""></a>
-                            </div>
-                            <figcaption class="product_content">
-                                <div class="price_box">
-                                    <span class="old_price">$86.00</span>
-                                    <span class="current_price">$79.00</span>
-                                </div>
-                                <h3 class="product_name"><a href="{% url 'produit' %}">Fusce ultricies dolor vitae
-                                        tristique suscipit</a></h3>
-                                <div class="add_to_cart">
-                                    <a href="cart.html" title="add to cart">Add to cart</a>
-                                </div>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
-                <div class="col-lg-4">
-                    <article class="single_product">
-                        <figure>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product15.jpg' %}" alt=""></a>
-                                <a class="secondary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product16.jpg' %}" alt=""></a>
-                            </div>
-                            <figcaption class="product_content">
-                                <div class="price_box">
-                                    <span class="old_price">$86.00</span>
-                                    <span class="current_price">$79.00</span>
-                                </div>
-                                <h3 class="product_name"><a href="{% url 'produit' %}">Natus erro at congue massa
-                                        commodo sit</a></h3>
-                                <div class="add_to_cart">
-                                    <a href="cart.html" title="add to cart">Add to cart</a>
-                                </div>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
-                <div class="col-lg-4">
-                    <article class="single_product">
-                        <figure>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product17.jpg' %}" alt=""></a>
-                                <a class="secondary_img" href="{% url 'produit' %}"><img
-                                        src="{% static 'assets/img/product/product18.jpg' %}" alt=""></a>
-                                <div class="label_product">
-                                    <span class="label_sale">sale</span>
-                                </div>
-                            </div>
-                            <figcaption class="product_content">
-                                <div class="price_box">
-                                    <span class="old_price">$86.00</span>
-                                    <span class="current_price">$79.00</span>
-                                </div>
-                                <h3 class="product_name"><a href="{% url 'produit' %}">Cras neque honcus consectetur
-                                        magna</a></h3>
-                                <div class="add_to_cart">
-                                    <a href="cart.html" title="add to cart">Add to cart</a>
-                                </div>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
+                {% endfor %}
+                
             </div>
         </div>
     </section>
@@ -751,20 +382,40 @@
                 </div>
             </div>
             <div class="product_carousel product_column5 owl-carousel">
+                {% for produit in produits %}
                 <article class="single_product">
                     <figure>
                         <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product1.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product2.jpg' %}" alt=""></a>
+                            <a class="primary_img" href="{% url 'produit' produit.id %}"><img
+                                src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
+                            <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
+                                src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
                             <div class="label_product">
                                 <span class="label_sale">sale</span>
                             </div>
                             <div class="action_links">
                                 <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                    {% if user.is_authenticated %}
+                                    {% if produit.id in favoris_ids %}
+                                        <li class="wishlist">
+                                            <a href="{% url 'supprimer_favoris' produit.id %}" title="Retirer des favoris">
+                                                <i class="fa fa-heart" style="color:white;"></i>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="wishlist">
+                                            <a href="{% url 'ajouter_favoris' produit.id %}" title="Ajouter aux favoris">
+                                                <i class="fa fa-heart-o"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% else %}
+                                        <li class="wishlist">
+                                            <a href="{% url 'login' %}" title="Connectez-vous pour ajouter aux favoris">
+                                                <i class="fa fa-heart-o"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
                                     <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
                                     </li>
                                     <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
@@ -772,223 +423,19 @@
                                 </ul>
                             </div>
                             <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
+                                <a href="{% url "produit" produit.id %}" title="add to cart">Add to cart</a>
                             </div>
                         </div>
                         <figcaption class="product_content">
                             <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
+                                <span class="old_price">{{produit.prix}} XOF</span>
+                                <span class="current_price">{{produit.prix}} XOF</span>
                             </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Natus erro at congue massa commodo
-                                    sit</a></h3>
+                            <h3 class="product_name"><a href="{% url 'produit' produit.id %}">{{produit.nom}}</a></h3>
                         </figcaption>
                     </figure>
                 </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product3.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product4.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Itaque earum velit elementum</a>
-                            </h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product5.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product6.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Mauris tincidunt eros posuere
-                                    placerat</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product7.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product8.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Morbi ornare vestibulum massa</a>
-                            </h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product9.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product10.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Porro quisquam eget feugiat
-                                    pretium</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product11.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product12.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Laudantium enim fringilla dignissim
-                                    ipsum primis</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product4.jpg' %}" alt=""></a>
-                            <a class="secondary_img" href="{% url 'produit' %}"><img
-                                    src="{% static 'assets/img/product/product5.jpg' %}" alt=""></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="cart.html" title="add to cart">Add to cart</a>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">$86.00</span>
-                                <span class="current_price">$79.00</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' %}">Natus erro at congue massa commodo
-                                    sit</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
+                {% endfor %}
             </div>
         </div>
     </section>
@@ -1027,20 +474,40 @@
                             <h2>Smartphone & Tablets</h2>
                         </div>
                         <div class="product_carousel product_column4 owl-carousel">
+                            {% for produit in produits %}
                             <article class="single_product">
                                 <figure>
                                     <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product1.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product2.jpg' %}" alt=""></a>
+                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
+                                            src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
+                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
+                                            src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
                                         <div class="label_product">
                                             <span class="label_sale">sale</span>
                                         </div>
                                         <div class="action_links">
                                             <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                {% if user.is_authenticated %}
+                                                {% if produit.id in favoris_ids %}
+                                                    <li class="wishlist">
+                                                        <a href="{% url 'supprimer_favoris' produit.id %}" title="Retirer des favoris">
+                                                            <i class="fa fa-heart" style="color:white;"></i>
+                                                        </a>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="wishlist">
+                                                        <a href="{% url 'ajouter_favoris' produit.id %}" title="Ajouter aux favoris">
+                                                            <i class="fa fa-heart-o"></i>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                                {% else %}
+                                                    <li class="wishlist">
+                                                        <a href="{% url 'login' %}" title="Connectez-vous pour ajouter aux favoris">
+                                                            <i class="fa fa-heart-o"></i>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
                                                 <li class="compare"><a href="#" title="compare"><span
                                                             class="ion-levels"></span></a></li>
                                                 <li class="quick_button"><a href="#" data-bs-toggle="modal"
@@ -1049,229 +516,19 @@
                                             </ul>
                                         </div>
                                         <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
+                                            <a href="{% url "produit" produit.id %}" title="add to cart">Add to cart</a>
                                         </div>
                                     </div>
                                     <figcaption class="product_content">
                                         <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
+                                            <span class="old_price">{{produit.prix}} XOF</span>
+                                            <span class="current_price">{{produit.prix}} XOF</span>
                                         </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' %}">Natus erro at congue
-                                                massa commodo sit</a></h3>
+                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">{{produit.nom}}</a></h3>
                                     </figcaption>
                                 </figure>
                             </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product3.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product4.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' %}">Itaque earum velit
-                                                elementum</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product5.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product6.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' %}">Mauris tincidunt eros
-                                                posuere placerat</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product7.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product8.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' %}">Morbi ornare vestibulum
-                                                massa</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product9.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product10.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' %}">Porro quisquam eget
-                                                feugiat pretium</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product11.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product12.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' %}">Laudantium enim
-                                                fringilla dignissim ipsum primis</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product4.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' %}"><img
-                                                src="{% static 'assets/img/product/product5.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' %}">Natus erro at congue
-                                                massa commodo sit</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -1344,71 +601,21 @@
             </div>
             <div class="row">
                 <div class="blog_carousel blog_column4 owl-carousel">
+                    {% for blog in blogs %}
                     <div class="col-lg-3">
                         <article class="single_blog">
                             <figure>
                                 <div class="blog_thumb">
-                                    <a href="{% url 'blog-detail' %}"><img src="{% static 'assets/img/blog/blog1.jpg' %}" alt=""></a>
+                                    <a href="{% url 'blog-detail' blog.id %}"><img src="{{ blog.image.url }}" alt="{{ blog.titre }}"></a>
                                 </div>
                                 <figcaption class="blog_content">
-                                    <p class="post_author">By <a href="#">admin</a> July 04, 2022</p>
-                                    <h3 class="post_title"><a href="{% url 'blog-detail' %}">Blog image post</a></h3>
+                                    <p class="post_author">By <a href="#">{{ blog.auteur }}</a> {{ blog.cartepublication|date:"M d, Y" }}</p>
+                                    <h3 class="post_title"><a href="{% url 'blog-detail' blog.id %}">{{ blog.titre }}</a></h3>
                                 </figcaption>
                             </figure>
                         </article>
                     </div>
-                    <div class="col-lg-3">
-                        <article class="single_blog">
-                            <figure>
-                                <div class="blog_thumb">
-                                    <a href="{% url 'blog-detail' %}"><img src="{% static 'assets/img/blog/blog2.jpg' %}" alt=""></a>
-                                </div>
-                                <figcaption class="blog_content">
-                                    <p class="post_author">By <a href="#">admin</a> July 04, 2022</p>
-                                    <h3 class="post_title"><a href="{% url 'blog-detail' %}">Post with Gallery</a></h3>
-                                </figcaption>
-                            </figure>
-                        </article>
-                    </div>
-                    <div class="col-lg-3">
-                        <article class="single_blog">
-                            <figure>
-                                <div class="blog_thumb">
-                                    <a href="{% url 'blog-detail' %}"><img src="{% static 'assets/img/blog/blog3.jpg' %}" alt=""></a>
-                                </div>
-                                <figcaption class="blog_content">
-                                    <p class="post_author">By <a href="#">admin</a> July 04, 2022</p>
-                                    <h3 class="post_title"><a href="{% url 'blog-detail' %}">Post with Audio</a></h3>
-                                </figcaption>
-                            </figure>
-                        </article>
-                    </div>
-                    <div class="col-lg-3">
-                        <article class="single_blog">
-                            <figure>
-                                <div class="blog_thumb">
-                                    <a href="{% url 'blog-detail' %}"><img src="{% static 'assets/img/blog/blog4.jpg' %}" alt=""></a>
-                                </div>
-                                <figcaption class="blog_content">
-                                    <p class="post_author">By <a href="#">admin</a> July 04, 2022</p>
-                                    <h3 class="post_title"><a href="{% url 'blog-detail' %}">Post with Video</a></h3>
-                                </figcaption>
-                            </figure>
-                        </article>
-                    </div>
-                    <div class="col-lg-3">
-                        <article class="single_blog">
-                            <figure>
-                                <div class="blog_thumb">
-                                    <a href="{% url 'blog-detail' %}"><img src="{% static 'assets/img/blog/blog5.jpg' %}" alt=""></a>
-                                </div>
-                                <figcaption class="blog_content">
-                                    <p class="post_author">By <a href="#">admin</a> July 04, 2022</p>
-                                    <h3 class="post_title"><a href="{% url 'blog-detail' %}">Maecenas ultricies</a></h3>
-                                </figcaption>
-                            </figure>
-                        </article>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
