@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'Ecommerce.apps.EcommerceConfig',
     'authentification.apps.AuthentificationConfig',
+    'blog.apps.BlogConfig',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +71,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'Ecommerce.context_processors.favoris_count',
                 'Ecommerce.context_processors.panier_context',
+                'Ecommerce.context_processors.commande_en_cours',
+                
             ],
         },
     },

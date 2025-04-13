@@ -10,7 +10,7 @@
         <div class="breadcrumb_content">
           <ul>
             <li><a href="{% url 'index' %}">home</a></li>
-            <li>Camera & Video</li>
+           
             <li>shop</li>
           </ul>
         </div>
@@ -54,189 +54,109 @@
             ></button>
           </div>
           <div class="niceselect_option">
-            <form class="select_option" action="#">
-              <select name="orderby" id="short">
-                <option selected value="1">Sort by average rating</option>
-                <option value="2">Sort by popularity</option>
-                <option value="3">Sort by newness</option>
-                <option value="4">Sort by price: low to high</option>
-                <option value="5">Sort by price: high to low</option>
-                <option value="6">Product Name: Z</option>
+            <form class="select_option" method="get">
+              <select name="orderby" id="short" onchange="this.form.submit()">
+                <option value="-note_moyenne" {% if request.GET.orderby == "-note_moyenne" %}selected{% endif %}>Sort by average rating</option>
+                <option value="-popularity" {% if request.GET.orderby == "-popularity" %}selected{% endif %}>Sort by popularity</option>
+                <option value="-created_at" {% if request.GET.orderby == "-created_at" %}selected{% endif %}>Sort by newness</option>
+                <option value="prix" {% if request.GET.orderby == "prix" %}selected{% endif %}>Sort by price: low to high</option>
+                <option value="-prix" {% if request.GET.orderby == "-prix" %}selected{% endif %}>Sort by price: high to low</option>
+                <option value="nom" {% if request.GET.orderby == "nom" %}selected{% endif %}>Product Name: A-Z</option>
               </select>
             </form>
           </div>
           <div class="page_amount">
-            <p>Showing 1–9 of 21 results</p>
+            <p>Affichage de {{ page_debut }} à {{ page_fin }} sur {{ total_resultats }} résultats</p>
           </div>
         </div>
         <!--shop toolbar end-->
 
-        <div class="row shop_wrapper">
-          {% for produit in page_obj %}
-          <div class="col-lg-4 col-md-4 col-12">
-            <article class="single_product">
-              <figure>
-                <div class="product_thumb">
-                  <a class="primary_img" href="{% url 'produit' produit.id %}"
-                    ><img src="{{produit.image.url}}" alt=""
-                  /></a>
-                  <a class="secondary_img" href="{% url 'produit' produit.id %}"
-                    ><img src="{{produit.image.url}}" alt=""
-                  /></a>
-                  <div class="label_product">
-                    <span class="label_sale">sale</span>
-                  </div>
-                  <div class="action_links">
-                    <ul>
+        <section class="shop_area py-5">
+          <div class="container">
+            <div class="row shop_wrapper">
+              {% for produit in page_obj %}
+              <div class="col-lg-4 col-md-6 col-12 mb-4">
+                <article class="single_product">
+                  <div class="card h-100 border-0 shadow-sm">
+                    <!-- Image avec ratio fixe -->
+                    <div class="position-relative">
+                      <a href="{% url 'produit' produit.id %}">
+                        <div class="ratio ratio-4x3">
+                          <img src="{{ produit.image.url }}" class="card-img-top object-fit-cover" alt="{{ produit.nom }}">
+                        </div>
+                      </a>
+                      <!-- Étiquette de promotion -->
+                      {% if produit.en_promotion %}
+                      <div class="label_product position-absolute top-0 start-0 m-2">
+                        <span class="badge bg-danger">Sale</span>
+                      </div>
+                      {% endif %}
+                      <!-- Actions (favoris, quick view, etc.) -->
+                      <div class="action_links position-absolute top-0 end-0 m-2 d-flex gap-2">
                         {% if user.is_authenticated %}
-                        {% if produit.id in favoris_ids %}
-                            <li class="wishlist">
-                                <a href="{% url 'supprimer_favoris' produit.id %}" title="Retirer des favoris">
-                                    <i class="fa fa-heart" style="color:white;"></i>
-                                </a>
-                            </li>
+                          {% if produit.id in favoris_ids %}
+                          <a href="{% url 'supprimer_favoris' produit.id %}" title="Retirer des favoris" class="text-danger">
+                            <i class="fa fa-heart"></i>
+                          </a>
+                          {% else %}
+                          <a href="{% url 'ajouter_favoris' produit.id %}" title="Ajouter aux favoris" class="text-dark">
+                            <i class="fa fa-heart-o"></i>
+                          </a>
+                          {% endif %}
                         {% else %}
-                            <li class="wishlist">
-                                <a href="{% url 'ajouter_favoris' produit.id %}" title="Ajouter aux favoris">
-                                    <i class="fa fa-heart-o"></i>
-                                </a>
-                            </li>
+                          <a href="{% url 'login' %}" title="Connectez-vous pour ajouter aux favoris" class="text-muted">
+                            <i class="fa fa-heart-o"></i>
+                          </a>
                         {% endif %}
+                        <a href="#" title="Compare" class="text-muted">
+                          <span class="ion-levels"></span>
+                        </a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" title="Quick view" class="text-muted">
+                          <span class="ion-ios-search-strong"></span>
+                        </a>
+                      </div>
+                    </div>
+                    <!-- Contenu de la carte -->
+                    <div class="card-body d-flex flex-column text-center">
+                      <h5 class="card-title mb-2 text-truncate">{{ produit.nom }}</h5>
+                      <div class="product_desc mb-2">
+                        <p class="text-muted mb-0 text-truncate">{{ produit.description|default:"Pas de description disponible" }}</p>
+                      </div>
+                      <div class="price_box mb-3 d-flex justify-content-center align-items-center">
+                        {% if produit.en_promotion %}
+                        <span class="old_price text-muted text-decoration-line-through me-2 text-nowrap">{{ produit.prix|floatformat:0 }} FCFA</span>
+                        <span class="current_price fw-bold text-danger text-nowrap">{{ produit.prix_final|floatformat:0 }} FCFA</span>
                         {% else %}
-                        <li class="wishlist">
-                            <a href="{% url 'login' %}" title="Connectez-vous pour ajouter aux favoris">
-                                <i class="fa fa-heart-o"></i>
+                        <span class="current_price fw-bold text-danger text-nowrap">{{ produit.prix|floatformat:0 }} FCFA</span>
+                        <span class="text-nowrap invisible">0 FCFA</span> <!-- Placeholder pour alignement -->
+                        {% endif %}
+                      </div>
+                      <div class="product_ratings mb-3">
+                        <ul class="d-flex justify-content-center list-unstyled">
+                          {% for i in "12345" %}
+                          <li>
+                            <a href="#">
+                              <i class="ion-android-star{% if i <= produit.note_moyenne|default:0 %}-outline{% endif %}"></i>
                             </a>
-                        </li>
-                    {% endif %}
-                      <li class="compare">
-                        <a href="#" title="compare"
-                          ><span class="ion-levels"></span
-                        ></a>
-                      </li>
-                      <li class="quick_button">
-                        <a
-                          href="#"
-                          data-bs-toggle="modal"
-                          data-bs-target="#modal_box"
-                          title="quick view"
-                        >
-                          <span class="ion-ios-search-strong"></span
-                        ></a>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="add_to_cart">
-                    <a href="{% url "produit" produit.id %}" title="add to cart">Add to cart</a>
-                  </div>
-                </div>
-                <div class="product_content grid_content">
-                  <div class="price_box">
-                    <span class="old_price">{{produit.prix}}XOF</span>
-                    <span class="current_price">{{produit.prix}}XOF</span>
-                  </div>
-                  <div class="product_ratings">
-                    <ul>
-                      <li>
-                        <a href="#"><i class="ion-android-star-outline"></i></a>
-                      </li>
-                      <li>
-                        <a href="#"><i class="ion-android-star-outline"></i></a>
-                      </li>
-                      <li>
-                        <a href="#"><i class="ion-android-star-outline"></i></a>
-                      </li>
-                      <li>
-                        <a href="#"><i class="ion-android-star-outline"></i></a>
-                      </li>
-                      <li>
-                        <a href="#"><i class="ion-android-star-outline"></i></a>
-                      </li>
-                    </ul>
-                  </div>
-                  <h3 class="product_name grid_name">
-                    <a href="{% url 'produit' produit.id %}">{{produit.nom}}</a>
-                  </h3>
-                </div>
-                <div class="product_content list_content">
-                  <div class="left_caption">
-                    <div class="price_box">
-                      <span class="old_price">{{produit.prix}}XOF</span>
-                      <span class="current_price">{{produit.prix}}XOF</span>
-                    </div>
-                    <h3 class="product_name">
-                      <a href="{% url 'produit' produit.id %}">{{produit.nom}}</a>
-                    </h3>
-                    <div class="product_ratings">
-                      <ul>
-                        <li>
-                          <a href="#"
-                            ><i class="ion-android-star-outline"></i
-                          ></a>
-                        </li>
-                        <li>
-                          <a href="#"
-                            ><i class="ion-android-star-outline"></i
-                          ></a>
-                        </li>
-                        <li>
-                          <a href="#"
-                            ><i class="ion-android-star-outline"></i
-                          ></a>
-                        </li>
-                        <li>
-                          <a href="#"
-                            ><i class="ion-android-star-outline"></i
-                          ></a>
-                        </li>
-                        <li>
-                          <a href="#"
-                            ><i class="ion-android-star-outline"></i
-                          ></a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="product_desc">
-                      <p>{{produit.description}}</p>
+                          </li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                      <div class="mt-auto">
+                        <a href="{% url 'produit' produit.id %}" class="btn btn-outline-primary btn-sm">Add to cart</a>
+                      </div>
                     </div>
                   </div>
-                  <div class="right_caption">
-                    <div class="add_to_cart">
-                      <a href="cart.html" title="add to cart">Add to cart</a>
-                    </div>
-                    <div class="action_links">
-                      <ul>
-                        <li class="wishlist">
-                          <a href="wishlist.html" title="Add to Wishlist"
-                            ><i class="fa fa-heart-o" aria-hidden="true"></i>
-                            Add to Wishlist</a
-                          >
-                        </li>
-                        <li class="compare">
-                          <a href="#" title="compare"
-                            ><span class="ion-levels"></span> Compare</a
-                          >
-                        </li>
-                        <li class="quick_button">
-                          <a
-                            href="#"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modal_box"
-                            title="quick view"
-                          >
-                            <span class="ion-ios-search-strong"></span> Quick
-                            View</a
-                          >
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </figure>
-            </article>
+                </article>
+              </div>
+              {% empty %}
+              <div class="col-12">
+                <p class="text-center">Aucun produit disponible.</p>
+              </div>
+              {% endfor %}
+            </div>
           </div>
-          {% endfor %}
-        </div>
+        </section>
 
         <div class="shop_toolbar t_bottom">
           <div class="pagination">
@@ -271,29 +191,36 @@
             <div class="widget_list widget_categories">
               <h2>Product categories</h2>
               <ul>
-                <li><a href="#">Cameras & Camcoders</a></li>
-                <li class="widget_sub_categories">
-                  <a href="javascript:void(0)">Computer & Networking</a>
-                  <ul class="widget_dropdown_categories">
-                    <li><a href="#">Computer</a></li>
-                    <li><a href="#">Networking</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">Games & Consoles</a></li>
-                <li><a href="#">Headphone & Speaker</a></li>
-                <li><a href="#">Movies & Video Games</a></li>
-                <li><a href="#">Smartphone</a></li>
-                <li><a href="#">Uncategorized</a></li>
+                {% for cat in categories %}
+                  {% with subcats=cat.categorie_souscategorie.all %}
+                    {% if subcats %}
+                      <li class="widget_sub_categories">
+                        <a href="{% url 'shop_by_categorie' cat.id %}">{{ cat.nom }}</a>
+                        <ul class="widget_dropdown_categories">
+                          {% for sub in subcats %}
+                            <li>
+                              <a href="{% url 'shop_by_souscategorie' sub.id %}">
+                                {{ sub.nom }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </li>
+                    {% else %}
+                      <li><a href="{% url 'shop_by_categorie' cat.id %}">{{ cat.nom }}</a></li>
+                    {% endif %}
+                  {% endwith %}
+                {% endfor %}
               </ul>
             </div>
-            <div class="widget_list widget_filter">
+            {% comment %} <div class="widget_list widget_filter">
               <h2>Filter by price</h2>
               <form action="#">
                 <div id="slider-range"></div>
                 <button type="submit">Filter</button>
                 <input type="text" name="text" id="amount" />
               </form>
-            </div>
+            </div> {% endcomment %}
             <div class="widget_list">
               <h2>Compare Products</h2>
               <div class="recent_product_container">
@@ -350,16 +277,7 @@
                 {% endfor %}
               </div>
             </div>
-            <div class="widget_list tags_widget">
-              <h2>Product tags</h2>
-              <div class="tag_cloud">
-                <a href="#">blouse</a>
-                <a href="#">clothes</a>
-                <a href="#">fashion</a>
-                <a href="#">handbag</a>
-                <a href="#">laptop</a>
-              </div>
-            </div>
+            
           </div>
         </aside>
         <!--sidebar widget end-->

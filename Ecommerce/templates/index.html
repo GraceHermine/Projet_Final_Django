@@ -7,58 +7,38 @@
 
 
     {% block content %}	
-    <!--slider area start-->
-    <section class="slider_section mb-70">
-        <div class="slider_area owl-carousel">
-            <div class="single_slider d-flex align-items-center" data-bgimg="{% static 'assets/img/slider/slider1.jpg' %}">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="slider_content">
-                                <h1> best skin</h1>
-                                <h2>qled 75 inch q7f</h2>
-                                <p>exclusive offer <span> 20% off </span> this week</p>
-                                <a class="button" href="{% url 'shop' %}">shopping now</a>
-                            </div>
+    <section class="slider_section mb-5 mt-5">
+    <div class="slider_area owl-carousel">
+        {% for produit in produits_slider %}
+        <div class="single_slider py-5" style="background-color: #e7f1fa;">
+            <div class="container">
+                <div class="row align-items-center">
+                    <!-- Texte à gauche -->
+                    <div class="col-md-6 text-start px-4">
+                        <div class="slider_content">
+                            <h1 class="display-5 fw-bold text-dark">{{ produit.nom }}</h1>
+                            <h2 class="h4 text-muted mb-3">{{ produit.souscategorie.nom }}</h2>
+                            <p class="lead text-secondary mb-4">{{ produit.description|truncatechars:70 }}</p>
+                            <a class="btn btn-primary btn-lg" href="{% url 'produit' produit.id %}">Voir le produit</a>
                         </div>
                     </div>
-                </div>
 
-            </div>
-            <div class="single_slider d-flex align-items-center" data-bgimg="{% static 'assets/img/slider/slider2.jpg' %}">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="slider_content">
-                                <h1>Dual Front</h1>
-                                <h2>camera 20mp</h2>
-                                <p>exclusive offer <span> 20% off </span> this week</p>
-                                <a class="button" href="{% url 'shop' %}">shopping now</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="single_slider d-flex align-items-center" data-bgimg="{% static 'assets/img/slider/slider3.jpg' %}">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="slider_content">
-                                <h1>Hurry Up!</h1>
-                                <h2>IN THE WORD 2022</h2>
-                                <p>exclusive offer <span> 20% off </span> this week</p>
-                                <a class="button" href="{% url 'shop' %}">shopping now</a>
-                            </div>
-                        </div>
+                    <!-- Image à droite -->
+                    <div class="col-md-6 text-center">
+                        <img src="{{ produit.image.url }}" alt="{{ produit.nom }}" class="img-fluid rounded shadow-sm" style="max-height: 350px;">
                     </div>
                 </div>
             </div>
         </div>
+        {% endfor %}
+    </div>
     </section>
-    <!--slider area end-->
+
+    
+    
 
     <!--shipping area start-->
-    <section class="shipping_area mb-70">
+    <!-- <section class="shipping_area mb-70">
         <div class="container">
             <div class=" row">
                 <div class="col-lg-3 col-md-6">
@@ -107,7 +87,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
     <!--shipping area end-->
 
     <!--banner area start-->
@@ -140,25 +120,203 @@
     </div>
     <!--banner area end-->
 
+    <section class="product_area py-5 bg-light">
+        <div class="container">
+          <div class="text-center mb-5">
+            <h2 class="fw-bold display-5">🔥 Offres du Moment 🔥</h2>
+            <p class="text-muted fs-5">Ne rate pas les promos les plus chaudes de la semaine !</p>
+          </div>
+      
+          <div class="owl-carousel owl-theme">
+            {% for produit in produits_promo %}
+            <div class="item">
+              <div class="card h-100 d-flex flex-column border-0 shadow-sm">
+                <!-- Image + actions -->
+                <div class="position-relative">
+                    <a href="{% url 'produit' produit.id %}">
+                        <div class="ratio ratio-16x9">
+                          <img src="{{ produit.image.url }}" class="card-img-top object-fit-cover" alt="{{ produit.nom }}">
+                        </div>
+                      </a>
+                  <span class="badge bg-danger position-absolute top-0 start-0 m-2">Promo</span>
+                  <div class="position-absolute top-0 end-0 m-2">
+                    {% if user.is_authenticated %}
+                      {% if produit.id in favoris_ids %}
+                        <a href="{% url 'supprimer_favoris' produit.id %}" class="text-danger me-2"><i class="fa fa-heart"></i></a>
+                      {% else %}
+                        <a href="{% url 'ajouter_favoris' produit.id %}" class="text-dark me-2"><i class="fa fa-heart-o"></i></a>
+                      {% endif %}
+                    {% else %}
+                      <a href="{% url 'login' %}" class="text-muted me-2"><i class="fa fa-heart-o"></i></a>
+                    {% endif %}
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" class="text-muted">
+                      <i class="ion-ios-search-strong"></i>
+                    </a>
+                  </div>
+                </div>
+      
+                <!-- Contenu du produit -->
+                <div class="card-body text-center d-flex flex-column flex-grow-1">
+                  <h5 class="card-title mb-1">{{ produit.nom }}</h5>
+                  <p class="text-muted small mb-2">{{ produit.souscategorie.nom }}</p>
+                  <div class="mb-3">
+                    <span class="text-muted text-decoration-line-through me-2">
+                      {{ produit.prix|floatformat:0 }} FCFA
+                    </span>
+                    <span class="fw-bold text-danger">
+                      {{ produit.prix_promo|floatformat:0 }} FCFA
+                    </span>
+                  </div>
+                  <div class="mt-auto">
+                    <a href="{% url 'produit' produit.id %}" class="btn btn-outline-primary btn-sm">Voir le produit</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+      
+    
+    
+
+    <!--banner area start-->
+    <div class="banner_area mb-40">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="single_banner mb-30">
+                        <div class="banner_thumb">
+                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner4.jpg' %}" alt=""></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="single_banner mb-30">
+                        <div class="banner_thumb">
+                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner5.jpg' %}" alt=""></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--banner area end-->
+
+    <!--top- category area start-->
+    {% if produit_par_categorie_top %}
+    <section class="top_category_product mb-70">
+        <div class="container">
+            <div class="row">
+            <div class="col-lg-2 col-md-3">
+                <div class="top_category_header">
+                <h3>Top Categories This Week</h3>
+                <p>Aliquam eget consectetuer habitasse interdum.</p>
+                <a href="{% url 'shop' %}">Show All Categories</a>
+                </div>
+            </div>
+
+            <div class="col-lg-10 col-md-9">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+                {% for item in produit_par_categorie_top %}
+                {% if item.produit %}
+                <div class="col d-flex">
+                    <div class="w-100 d-flex flex-column shadow-sm border rounded p-2 h-100">
+                    <!-- Nom de la sous-catégorie -->
+                    <h6 class="text-uppercase fw-bold text-center mb-2 text-primary" style="font-size: 0.9rem;">
+                        {{ item.categorie.nom }}
+                    </h6>
+
+                    <article class="single_category w-100 d-flex flex-column h-100">
+                        <figure class="d-flex flex-column h-100">
+                        <div class="category_thumb ratio ratio-4x3">
+                            <a href="{% url 'produit' item.produit.id %}">
+                            <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}"
+                                class="img-fluid w-100 h-100 object-fit-cover">
+                            </a>
+                        </div>
+                        <figcaption class="category_name mt-auto text-center p-2">
+                            <h6 class="mb-1 fw-bold">
+                            {{ item.categorie.categorie.nom }}
+                            </h6>
+                            <p class="text-muted small mb-0">{{ item.produit.nom }}</p>
+                        </figcaption>
+                        </figure>
+                    </article>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!--top- category area end-->
+
+    <!--featured product area start-->
+    <section class="featured_product_area mb-70">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <div class="section_title">
+                <h2>Featured Products</h2>
+              </div>
+            </div>
+          </div>
+      
+          <div class="row featured_container featured_column3">
+            {% for produit in produits %}
+            <div class="col-lg-4 d-flex">
+              <div class="card h-100 w-100 d-flex flex-column border-0 shadow-sm">
+                <!-- Image avec ratio fixe -->
+                <a href="{% url 'produit' produit.id %}" class="text-decoration-none">
+                  <div class="ratio ratio-4x3">
+                    <img src="{{ produit.image.url }}" alt="{{ produit.nom }}" class="card-img-top object-fit-cover">
+                  </div>
+                </a>
+      
+                <!-- Contenu -->
+                <div class="card-body d-flex flex-column text-center">
+                  <h5 class="card-title">{{ produit.nom }}</h5>
+                  <div class="price_box mb-2">
+                    <span class="current_price fw-bold text-danger">{{ produit.prix|floatformat:0 }} FCFA</span>
+                  </div>
+                  <div class="mt-auto">
+                    <a href="{% url 'produit' produit.id %}" class="btn btn-outline-primary btn-sm">Voir le produit</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+      
+    <!--featured product area end-->
+
     <!--product area start-->
     <section class="product_area mb-46">
         <div class="container">
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Hot Deals Products</h2>
+                        <h2>Menches Longues</h2>
                     </div>
                 </div>
             </div>
             <div class="product_carousel product_column5 owl-carousel">
-                {% for produit in produits %}
+                {% for produit in cat_femme %}
                 <article class="single_product">
                     <figure>
                         <div class="product_thumb">
                             <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                    src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
+                                src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
                             <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                    src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
+                                src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
                             <div class="label_product">
                                 <span class="label_sale">sale</span>
                             </div>
@@ -194,13 +352,10 @@
                             <div class="add_to_cart">
                                 <a href="{% url 'produit' produit.id %}" title="add to cart">Add to cart</a>
                             </div>
-                            <div class="product_timing">
-                                <div data-countdown="2025/12/15"></div>
-                            </div>
                         </div>
                         <figcaption class="product_content">
                             <div class="price_box">
-                                <span class="old_price">{{produit.prix}} FCFA</span>
+                                <!-- <span class="old_price">{{produit.prix}} FCFA</span> -->
                                 <span class="current_price">{{produit.prix}} FCFA</span>
                             </div>
                             <h3 class="product_name"><a href="{% url 'produit' produit.id %}">{{produit.nom}}</a></h3>
@@ -214,412 +369,158 @@
     <!--product area end-->
 
     <!--banner area start-->
-    <div class="banner_area mb-40">
+    <div class="banner_area ">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-6 col-md-6">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner4.jpg' %}" alt=""></a>
-                        </div>
+            <div class="row g-3">
+                <div class="col-lg-8 col-md-2">
+                    <div class="single_banner h-50">
+                        <a href="{% url 'shop' %}" class="d-block h-100">
+                            <img src="{% static 'assets/img/affiche02.jpeg' %}" class="img-fluid w-100 h-100 object-fit-cover rounded shadow" alt="Affiche 02">
+                        </a>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner5.jpg' %}" alt=""></a>
-                        </div>
+                <div class="col-lg-3 col-md-2">
+                    <div class="single_banner h-100">
+                        <a href="{% url 'shop' %}" class="d-block h-100">
+                            <img src="{% static 'assets/img/affiche03.jpeg' %}" class="img-fluid w-100 h-50 object-fit-cover rounded shadow" alt="Affiche 03">
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!--banner area end-->
-
-    <!--top- category area start-->
-    <section class="top_category_product mb-70">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-2 col-md-3">
-                    <div class="top_category_header">
-                        <h3>Top Categories This Week</h3>
-                        <p>Aliquam eget consectetuer habitasse interdum.</p>
-                        <a href="{% url 'shop' %}">Show All Categories</a>
-                    </div>
-                </div>
-                <div class="col-lg-10 col-md-9">
-                    <div class="top_category_container category_column5 owl-carousel">
-                        <div class="col-lg-2">
-                            <article class="single_category">
-                                <figure>
-                                    <div class="category_thumb">
-                                        <a href="{% url 'shop' %}"><img src="{% static 'assets/img/s-product/category1.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="category_name">
-                                        <h3><a href="{% url 'shop' %}">Games & Consoles </a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                        </div>
-                        <div class="col-lg-2">
-                            <article class="single_category">
-                                <figure>
-                                    <div class="category_thumb">
-                                        <a href="{% url 'shop' %}"><img src="{% static 'assets/img/s-product/category2.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="category_name">
-                                        <h3><a href="{% url 'shop' %}">Home Accessories</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                        </div>
-                        <div class="col-lg-2">
-                            <article class="single_category">
-                                <figure>
-                                    <div class="category_thumb">
-                                        <a href="{% url 'shop' %}"><img src="{% static 'assets/img/s-product/category3.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="category_name">
-                                        <h3><a href="{% url 'shop' %}">TV & Audio</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                        </div>
-                        <div class="col-lg-2">
-                            <article class="single_category">
-                                <figure>
-                                    <div class="category_thumb">
-                                        <a href="{% url 'shop' %}"><img src="{% static 'assets/img/s-product/category4.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="category_name">
-                                        <h3><a href="{% url 'shop' %}">Games & Consoles </a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                        </div>
-                        <div class="col-lg-2">
-                            <article class="single_category">
-                                <figure>
-                                    <div class="category_thumb">
-                                        <a href="{% url 'shop' %}"><img src="a{% static 'ssets/img/s-product/category5.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="category_name">
-                                        <h3><a href="{% url 'shop' %}">Laptop & Tablets </a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                        </div>
-                        <div class="col-lg-2">
-                            <article class="single_category">
-                                <figure>
-                                    <div class="category_thumb">
-                                        <a href="{% url 'shop' %}"><img src="{% static 'assets/img/s-product/category2.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="category_name">
-                                        <h3><a href="{% url 'shop' %}">Home Accessories</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--top- category area end-->
-
-    <!--featured product area start-->
-    <section class="featured_product_area mb-70">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section_title">
-                        <h2>Featured Products</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="row featured_container featured_column3">
-                {% for produit in produits %}
-                <div class="col-lg-4">
-                    <article class="single_product">
-                        <figure>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                        src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
-                                <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                        src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
-                                <div class="label_product">
-                                    <span class="label_sale">sale</span>
-                                </div>
-                            </div>
-                            <figcaption class="product_content">
-                                <div class="price_box">
-                                    <span class="current_price">{{produit.prix}} XOF</span>
-                                </div>
-                                <h3 class="product_name"><a href="{% url 'produit' produit.id %}">{{produit.nom}}</a></h3>
-                                <div class="add_to_cart">
-                                    <a href="{% url "produit" produit.id %}" title="add to cart">Add to cart</a>
-                                </div>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
-                {% endfor %}
-                
-            </div>
-        </div>
-    </section>
-    <!--featured product area end-->
-
-    <!--product area start-->
-    <section class="product_area mb-46">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section_title">
-                        <h2>Computer & Laptop</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="product_carousel product_column5 owl-carousel">
-                {% for produit in produits %}
-                <article class="single_product">
-                    <figure>
-                        <div class="product_thumb">
-                            <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
-                            <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
-                            <div class="label_product">
-                                <span class="label_sale">sale</span>
-                            </div>
-                            <div class="action_links">
-                                <ul>
-                                    {% if user.is_authenticated %}
-                                    {% if produit.id in favoris_ids %}
-                                        <li class="wishlist">
-                                            <a href="{% url 'supprimer_favoris' produit.id %}" title="Retirer des favoris">
-                                                <i class="fa fa-heart" style="color:white;"></i>
-                                            </a>
-                                        </li>
-                                    {% else %}
-                                        <li class="wishlist">
-                                            <a href="{% url 'ajouter_favoris' produit.id %}" title="Ajouter aux favoris">
-                                                <i class="fa fa-heart-o"></i>
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                    {% else %}
-                                        <li class="wishlist">
-                                            <a href="{% url 'login' %}" title="Connectez-vous pour ajouter aux favoris">
-                                                <i class="fa fa-heart-o"></i>
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                    <li class="compare"><a href="#" title="compare"><span class="ion-levels"></span></a>
-                                    </li>
-                                    <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                            title="quick view"> <span class="ion-ios-search-strong"></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="add_to_cart">
-                                <a href="{% url "produit" produit.id %}" title="add to cart">Add to cart</a>
-                            </div>
-                        </div>
-                        <figcaption class="product_content">
-                            <div class="price_box">
-                                <span class="old_price">{{produit.prix}} XOF</span>
-                                <span class="current_price">{{produit.prix}} XOF</span>
-                            </div>
-                            <h3 class="product_name"><a href="{% url 'produit' produit.id %}">{{produit.nom}}</a></h3>
-                        </figcaption>
-                    </figure>
-                </article>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    <!--product area end-->
-
-    <!--banner area start-->
-    <div class="banner_area mb-40">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-9 col-md-9">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner6.jpg' %}" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner7.jpg' %}" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
     <!--banner area end-->
 
     <!--product area start-->
     <section class="product_area mb-46">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-9 col-md-12">
-                    <div class="product_left_area">
-                        <div class="section_title">
-                            <h2>Smartphone & Tablets</h2>
-                        </div>
-                        <div class="product_carousel product_column4 owl-carousel">
-                            {% for produit in produits %}
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                            src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                            src="{{produit.image.url}}" alt="{{produit.nom}}"></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                {% if user.is_authenticated %}
-                                                {% if produit.id in favoris_ids %}
-                                                    <li class="wishlist">
-                                                        <a href="{% url 'supprimer_favoris' produit.id %}" title="Retirer des favoris">
-                                                            <i class="fa fa-heart" style="color:white;"></i>
-                                                        </a>
-                                                    </li>
-                                                {% else %}
-                                                    <li class="wishlist">
-                                                        <a href="{% url 'ajouter_favoris' produit.id %}" title="Ajouter aux favoris">
-                                                            <i class="fa fa-heart-o"></i>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-                                                {% else %}
-                                                    <li class="wishlist">
-                                                        <a href="{% url 'login' %}" title="Connectez-vous pour ajouter aux favoris">
-                                                            <i class="fa fa-heart-o"></i>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="{% url "produit" produit.id %}" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">{{produit.prix}} XOF</span>
-                                            <span class="current_price">{{produit.prix}} XOF</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">{{produit.nom}}</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            {% endfor %}
-                        </div>
-                    </div>
+          <div class="row">
+            <!-- Liste des produits -->
+            <div class="col-lg-9 col-md-12">
+              <div class="product_left_area">
+                <div class="section_title">
+                  <h2>Menches Courte</h2>
                 </div>
-                <div class="col-lg-3 col-md-12">
-                    <!--testimonials section start-->
-                    <div class="testimonial_are">
-                        <div class="section_title">
-                            <h2>Testimonials</h2>
+                <div class="product_carousel product_column4 owl-carousel">
+                  {% for prod in menche %}
+                  <div class="item">
+                    <div class="card h-100 d-flex flex-column border-0 shadow-sm">
+                      <!-- Image fixe et bien dimensionnée -->
+                      <div class="position-relative">
+                        <a href="{% url 'produit' prod.id %}">
+                          <div class="ratio ratio-4x3">
+                            <img src="{{ prod.image.url }}" class="card-img-top object-fit-cover" alt="{{ prod.nom }}">
+                          </div>
+                        </a>
+                        <!-- <span class="badge bg-danger position-absolute top-0 start-0 m-2">Promo</span> -->
+      
+                        <div class="position-absolute top-0 end-0 m-2">
+                          {% if user.is_authenticated %}
+                            {% if prod.id in favoris_ids %}
+                              <a href="{% url 'supprimer_favoris' prod.id %}" class="text-danger me-2"><i class="fa fa-heart"></i></a>
+                            {% else %}
+                              <a href="{% url 'ajouter_favoris' prod.id %}" class="text-dark me-2"><i class="fa fa-heart-o"></i></a>
+                            {% endif %}
+                          {% else %}
+                            <a href="{% url 'login' %}" class="text-muted me-2"><i class="fa fa-heart-o"></i></a>
+                          {% endif %}
+                          <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" class="text-muted">
+                            <i class="ion-ios-search-strong"></i>
+                          </a>
                         </div>
-                        <div class="testimonial_active owl-carousel">
-                            <article class="single_testimonial">
-                                <figure>
-                                    <div class="testimonial_thumb">
-                                        <a href="#"><img src="{% static 'assets/img/about/testimonial1.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="testimonial_content">
-                                        <p>Support and response has been amazing, helping me with several issues I came
-                                            across and got them solved almost the same day. A pleasure to work with
-                                            them!</p>
-                                        <h3><a href="#">Kathy Young</a><span> - CEO of SunPark</span></h3>
-                                    </figcaption>
-
-                                </figure>
-                            </article>
-                            <article class="single_testimonial">
-                                <figure>
-                                    <div class="testimonial_thumb">
-                                        <a href="#"><img src="{% static 'assets/img/about/testimonial2.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="testimonial_content">
-                                        <p>Perfect Themes and the best of all that you have many options to choose! Best
-                                            Support team ever! Thank you very much!</p>
-                                        <h3><a href="#">John Sullivan</a><span> - Customer</span></h3>
-                                    </figcaption>
-
-                                </figure>
-                            </article>
-                            <article class="single_testimonial">
-                                <figure>
-                                    <div class="testimonial_thumb">
-                                        <a href="#"><img src="{% static 'assets/img/about/testimonial3.jpg' %}" alt=""></a>
-                                    </div>
-                                    <figcaption class="testimonial_content">
-                                        <p>Code, template and others are very good. The support has served me
-                                            immediately and solved my problems when I need help. Are to be
-                                            congratulated.</p>
-                                        <h3><a href="#">Jenifer Brown</a><span> - Manager of AZ</span></h3>
-                                    </figcaption>
-
-                                </figure>
-                            </article>
+                      </div>
+      
+                      <!-- Contenu de la carte -->
+                      <div class="card-body d-flex flex-column text-center">
+                        <h5 class="card-title">{{ prod.nom }}</h5>
+                        <div class="price_box mb-3">
+                          <span class="current_price fw-bold text-danger">{{ prod.prix|floatformat:0 }} FCFA</span>
                         </div>
+                        <div class="mt-auto">
+                          <a href="{% url 'produit' prod.id %}" class="btn btn-outline-primary btn-sm">Voir le produit</a>
+                        </div>
+                      </div>
                     </div>
-                    <!--testimonials section end-->
+                  </div>
+                  {% endfor %}
                 </div>
+              </div>
             </div>
-        </div>
-    </section>
-    <!--product area end-->
-
-    <!--blog area start-->
-    <section class="blog_section mb-70">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
+      
+            <!-- Témoignages -->
+            <div class="col-lg-3 col-md-12">
+                {% if temoignages %}
+                <div class="testimonial_are">
                     <div class="section_title">
-                        <h2>From the Blog</h2>
+                        <h2>Témoignages</h2>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="blog_carousel blog_column4 owl-carousel">
-                    {% for blog in blogs %}
-                    <div class="col-lg-3">
-                        <article class="single_blog">
+                    <div class="testimonial_active owl-carousel">
+                        {% for temoignage in temoignages %}
+                        <article class="single_testimonial text-center">
                             <figure>
-                                <div class="blog_thumb">
-                                    <a href="{% url 'blog-detail' blog.id %}"><img src="{{ blog.image.url }}" alt="{{ blog.titre }}"></a>
+                                <div class="testimonial_thumb mx-auto mb-3" style="width: 120px; height: 120px; overflow: hidden; border-radius: 50%; border: 3px solid #e75800;">
+                                    <img src="{{ temoignage.photo.url }}" alt="{{ temoignage.nom }}" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
-                                <figcaption class="blog_content">
-                                    <p class="post_author">By <a href="#">{{ blog.auteur }}</a> {{ blog.cartepublication|date:"M d, Y" }}</p>
-                                    <h3 class="post_title"><a href="{% url 'blog-detail' blog.id %}">{{ blog.titre }}</a></h3>
+                                <figcaption class="testimonial_content">
+                                    <p class="fst-italic">"{{ temoignage.message }}"</p>
+                                    <h5 class="mt-2 mb-0">{{ temoignage.nom }}</h5>
+                                    <small class="text-muted">{{ temoignage.fonction }}</small>
                                 </figcaption>
                             </figure>
                         </article>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
+                {% endif %}
             </div>
+            
+          </div>
         </div>
-    </section>
-    <!--blog area end-->
-    {% endblock content %}
+      </section>
+      
+    <!--product area end-->
+
+    <section class="blog_section mb-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold" style="color: #f5af19;">From the Blog</h2>
+      </div>
+    </div>
+
+    <div class="owl-carousel owl-theme blog_carousel">
+      {% for blog in blogs %}
+      <div class="card shadow-sm border-0 rounded-4 overflow-hidden d-flex flex-column h-100" style="width: 100%; max-width: 300px; min-height: 450px;">
+        <!-- Image -->
+        <div class="ratio ratio-4x3">
+          <img src="{{ blog.image.url }}" alt="{{ blog.titre }}" class="img-fluid object-fit-cover w-100 h-100">
+        </div>
+
+        <!-- Contenu -->
+        <div class="card-body d-flex flex-column justify-content-between flex-grow-1">
+          <p class="text-muted small mb-2">
+            Publié par <span class="fw-semibold text-dark">{{ blog.auteur }}</span><br>
+            {{ blog.cartepublication|date:"d M Y" }}
+          </p>
+
+          <h5 class="card-title fw-bold mb-3">
+            <a href="{% url 'blog-detail' blog.id %}" class="text-dark text-decoration-none">{{ blog.titre }}</a>
+          </h5>
+
+          <div class="mt-auto">
+            <a href="{% url 'blog-detail' blog.id %}" class="btn btn-sm text-white" style="background-color: #f5af19;">Lire plus</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+      
+    <!-- Blog area end -->
     
+    
+    {% endblock content %}
+        

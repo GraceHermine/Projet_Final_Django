@@ -4,7 +4,7 @@
 <html class="no-js" lang="en">
 
 
-<!-- Mirrored from htmldemo.net/junko/junko/wishlist.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 30 Mar 2025 15:20:01 GMT -->
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -21,6 +21,11 @@
     <!-- CSS 
     ========================= -->
 
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"/>
 
     <!-- Plugins CSS -->
     <link rel="stylesheet" href="{% static 'assets/css/plugins.css' %}">
@@ -53,7 +58,7 @@
                             <a href="javascript:void(0)"><i class="ion-android-close"></i></a>
                         </div>
                         <div class="support_info">
-                            <p>Telephone Enquiry: <a href="tel:0123456789">0123456789</a></p>
+                            <p>Telephone : <a href="tel:0123456789">0719311073</a></p>
                         </div>
                         <div class="top_right text-end">
                             <ul>
@@ -66,35 +71,33 @@
                                 </li>
                                 <li>
                                     {% if user.is_authenticated %}
-                                    <a href="{% url "checkout" %}"> Checkout </a>
+                                        {% if commande_id %}
+                                            <a href="{% url 'checkout' commande_id %}"> Checkout </a>
+                                        {% else %}
+                                            <a href=""> Checkout </a>
+                                        {% endif %}
                                     {% else %}
-                                        <a href="{% url 'login' %}?next={% url 'checkout' %}">Checkout</a>
+                                        <a href="{% url 'login' %}?next={% url 'cart' %}">Checkout</a>
                                     {% endif %}
                                 </li>
                             </ul>
                         </div>
                         <div class="search_container">
                             <form action="#">
+                                <!-- j'arrive -->
                                 <div class="hover_category">
                                     <select class="select_option" name="select" id="categori">
-                                        <option selected value="1">All Categories</option>
-                                        <option value="2">Accessories</option>
-                                        <option value="3">Accessories & More</option>
-                                        <option value="4">Butters & Eggs</option>
-                                        <option value="5">Camera & Video </option>
-                                        <option value="6">Mornitors</option>
-                                        <option value="7">Tablets</option>
-                                        <option value="8">Laptops</option>
-                                        <option value="9">Handbags</option>
-                                        <option value="10">Headphone & Speaker</option>
-                                        <option value="11">Herbs & botanicals</option>
-                                        <option value="12">Vegetables</option>
-                                        <option value="13">Shop</option>
-                                        <option value="14">Laptops & Desktops</option>
-                                        <option value="15">Watchs</option>
-                                        <option value="16">Electronic</option>
+                                      <option selected value="1">All Categories</option>
+                                      {% for cat in categories %}
+                                        <option value="{{ cat.id }}">{{ cat.nom }}</option>
+                                        {% with subcats=cat.categorie_souscategorie.all %}
+                                          {% for sub in subcats %}
+                                            <option value="{{ sub.id }}">&nbsp;&nbsp;- {{ sub.nom }}</option>
+                                          {% endfor %}
+                                        {% endwith %}
+                                      {% endfor %}
                                     </select>
-                                </div>
+                                  </div>
                                 <div class="search_box">
                                     <input placeholder="Search product..." type="text">
                                     <button type="submit">Search</button>
@@ -105,10 +108,10 @@
                         <div class="middel_right_info">
                             <div class="header_wishlist">
                                 {% if user.is_authenticated %}
-                                <a href="{% url "wishlist" %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                <a href="{% url 'wishlist' %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
                                 <span class="wishlist_quantity">{{ favoris_count }}</span>
                                 {% else %}
-                                <a href="{% url "login" %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                <a href="{% url 'login' %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
                                 <span class="wishlist_quantity">0</span>
                                 {% endif %}
                             </div>
@@ -153,7 +156,15 @@
                                             <a href="{% url 'cart' %}">View cart</a>
                                         </div>
                                         <div class="cart_button">
-                                            <a href="{% url 'checkout' %}">Checkout</a>
+                                            {% if user.is_authenticated %}
+                                                {% if commande_id %}
+                                                    <a href="{% url 'checkout' commande_id %}"> Checkout </a>
+                                                {% else %}
+                                                    <a href=""> Checkout </a>
+                                                {% endif %}
+                                            {% else %}
+                                                    <a href="{% url 'login' %}?next={% url 'cart' %}">Checkout</a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -166,7 +177,7 @@
                                 </li>
                                 <li class="menu-item-has-children {% if request.path == '/shop/' %}active{% endif %}">
                                     <a href="{% url 'shop' %}">Shop</a>
-                                    <ul class="sub-menu">
+                                    {% comment %} <ul class="sub-menu">
                                         <li class="menu-item-has-children">
                                             <a href="{% url 'shop' %}">Shop Layouts</a>
                                             
@@ -191,13 +202,13 @@
                                                 <li><a href="product-countdown.html">product countdown</a></li>
                                             </ul>
                                         </li>
-                                    </ul>
+                                    </ul> {% endcomment %}
                                 </li>
                                 <li class="menu-item-has-children {% if request.path == '/blog/' %}active{% endif %}">
                                     <a href="{% url 'blog' %}">blog</a>
                                 </li>
                                 <li class="menu-item-has-children {% if request.path == '/service/' %}active{% endif %}">
-                                    <a href="{% url "service" %}">services</a>
+                                    <a href="{% url 'service' %}">services</a>
                                     
                                 </li>
                                 
@@ -216,18 +227,18 @@
                                 </li>
                                 {% if user.is_authenticated %}
                                 <li class="menu-item-has-children {% if request.path == '/account/' %}active{% endif %}">
-                                    <a href="{% url "account" %}">{{user.nom}}</a>
+                                    <a href="{% url 'account' %}">{{user.nom}}</a>
                                 </li>
                                 {% else %}
                                 <li class="menu-item-has-children {% if request.path == '/login/' or request.path == '/register/' %}active{% endif %}">
-                                    <a href="{% url "login" %}">login</a>
+                                    <a href="{% url 'login' %}">login</a>
                                 </li>
                                 {% endif %}
                             </ul>
                         </div>
 
                         <div class="Offcanvas_footer">
-                            <span><a href="#"><i class="fa fa-envelope-o"></i> info@yourdomain.com</a></span>
+                            <span><a href="#"><i class="fa fa-envelope-o"></i> dedjeneg@gmail.com</a></span>
                             <ul>
                                 <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
                                 <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
@@ -266,9 +277,13 @@
                                     </li>
                                     <li>
                                         {% if user.is_authenticated %}
-                                        <a href="{% url "checkout" %}"> Checkout </a>
+                                        {% if commande_id %}
+                                        <a href="{% url 'checkout' commande_id %}"> Checkout </a>
                                         {% else %}
-                                            <a href="{% url 'login' %}?next={% url 'checkout' %}">Checkout</a>
+                                        <a href=""> Checkout </a>
+                                        {% endif %}
+                                        {% else %}
+                                            <a href="{% url 'login' %}?next={% url 'cart' %}">Checkout</a>
                                         {% endif %}
                                     </li>
                                 </ul>
@@ -284,7 +299,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-3 col-md-6">
                             <div class="logo">
-                                <a href="{% url 'index' %}"><img src="{% static 'assets/img/logo/logo.png' %}" alt=""></a>
+                                <a href="{% url 'index' %}"><img src="{% static 'assets/img/icon.png' %}" alt=""></a>
                             </div>
                         </div>
                         <div class="col-lg-9 col-md-6">
@@ -368,7 +383,15 @@
                                                     <a href="{% url 'cart' %}">View cart</a>
                                                 </div>
                                                 <div class="cart_button">
-                                                    <a href="{% url 'checkout' %}">Checkout</a>
+                                                    {% if user.is_authenticated %}
+                                                    {% if commande_id %}
+                                                    <a href="{% url 'checkout' commande_id %}"> Checkout </a>
+                                                    {% else %}
+                                                    <a href=""> Checkout </a>
+                                                    {% endif %}
+                                                    {% else %}
+                                                        <a href="{% url 'login' %}?next={% url 'cart' %}">Checkout</a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -523,7 +546,7 @@
                                         </li>
                                         <li class="mega_items"><a href="{% url 'shop' %}">shop<i
                                                     class="fa fa-angle-down"></i></a>
-                                            <div class="mega_menu">
+                                            {% comment %} <div class="mega_menu">
                                                 <ul class="mega_menu_inner">
                                                     <li><a href="#">Shop Layouts</a>
                                                         <ul>
@@ -572,7 +595,7 @@
                                                         </ul>
                                                     </li>
                                                 </ul>
-                                            </div>
+                                            </div> {% endcomment %}
                                         </li>
                                         <li>
                                             <a class="{% if request.path == '/blog/' %}active{% endif %}" href="{% url 'blog' %}">blog</a>
@@ -606,7 +629,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-3">
                     <div class="logo">
-                        <a  href="{% url 'index' %}"><img src="{% static 'assets/img/logo/logo.png' %}" alt=""></a>
+                        <a  href="{% url 'index' %}"><img src="{% static 'assets/img/icon.png' %}" alt=""></a>
                     </div>
                 </div>
                 <div class="col-lg-9">
@@ -614,22 +637,19 @@
                         <div class="main_menu">
                             <nav>
                                 <ul>
-                                    <li><a class="{% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}">Accueil</a>
-                                        
-                                    </li>
-                                    <li class="mega_items"><a class="{% if request.path == '/shop/' %}active{% endif %}" href="{% url 'shop' %}">shop<i
-                                                class="fa fa-angle-down"></i></a>
+                                    <li><a class="{% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}">Accueil</a></li>
+                                    <li><a class="{% if request.path == '/shop/' %}active{% endif %}" href="{% url 'shop' %}">shop</a>
                                         <div class="mega_menu">
                                             <ul class="mega_menu_inner">
                                                 <li><a href="#">Shop Layouts</a>
-                                                    <ul>
+                                                    {% comment %} <ul>
                                                         <li><a href="shop-fullwidth.html">Full Width</a></li>
                                                         <li><a href="shop-fullwidth-list.html">Full Width list</a></li>
                                                         <li><a href="shop-right-sidebar.html">Right Sidebar </a></li>
                                                         <li><a href="shop-right-sidebar-list.html"> Right Sidebar
                                                                 list</a></li>
                                                         <li><a href="shop-list.html">List View</a></li>
-                                                    </ul>
+                                                    </ul> {% endcomment %}
                                                 </li>
                                                 <li><a href="#">other Pages</a>
                                                     <ul>
@@ -664,12 +684,10 @@
                                             </ul>
                                         </div>
                                     </li>
-                                    <li><a class="{% if request.path == '/blog/' %}active{% endif %}" href="{% url 'blog' %}">blog</a>
-                                        
-                                    </li>
+                                    <li><a class="{% if request.path == '/blog/' %}active{% endif %}" href="{% url 'blog' %}">blog</a></li>
                                     
                                        
-                                    </li>
+                                   
                                     <li><a class="{% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">about Us</a></li>
                                     <li><a class="{% if request.path == '/contact/' %}active{% endif %}" href="{% url 'contact' %}"> Contact Us</a></li>
                                     {% if user.is_authenticated %}
@@ -731,7 +749,15 @@
                                             <a href="{% url 'cart' %}">View cart</a>
                                         </div>
                                         <div class="cart_button">
-                                            <a href="{% url 'checkout' %}">Checkout</a>
+                                            {% if user.is_authenticated %}
+                                        {% if commande_id %}
+                                        <a href="{% url 'checkout' commande_id %}"> Checkout </a>
+                                        {% else %}
+                                        <a href=""> Checkout </a>
+                                        {% endif %}
+                                        {% else %}
+                                            <a href="{% url 'login' %}?next={% url 'cart' %}">Checkout</a>
+                                        {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -757,15 +783,14 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="widgets_container contact_us">
                             <div class="footer_logo">
-                                <a href="#"><img src="{% static 'assets/img/logo/logo.png' %}" alt=""></a>
+                                <a href="#"><img src="{% static 'assets/img/icon.png' %}" alt=""></a>
                             </div>
                             <div class="footer_contact">
-                                <p>We are a team of designers and developers that
-                                    create high quality HTML Template, Woocommerce, Shopify Theme.</p>
-                                <p><span>Address</span> Your address goes here.</p>
-                                <p><span>Mobile: </span><a href="tel:0123456789">0123456789</a> – <a
-                                        href="tel:0123456789">0123456789</a> </p>
-                                <p><span>Support: </span><a href="mailto:demo@example.com">demo@example.com</a>
+                                <p>Je dois mettre un slogan</p>
+                                <p><span>Address</span> Bonoua/Yaou</p>
+                                <p><span>Mobile: </span><a href="tel:0123456789">0719311073</a> – <a
+                                        href="tel:0123456789">0719311073</a> </p>
+                                <p><span>Support: </span><a href="mailto:demo@example.com">dedjeneg@gmail.com</a>
                                 </p>
                             </div>
                         </div>
@@ -833,12 +858,12 @@
                                 </ul>
                             </div>
                             <div class="subscribe_form">
-                                <h3>Join Our Newsletter Now</h3>
+                                <!-- <h3>Join Our Newsletter Now</h3>
                                 <form id="mc-form" class="mc-form footer-newsletter">
                                     <input id="mc-email" type="email" autocomplete="off"
                                         placeholder="Your email address..." />
                                     <button id="mc-submit">Subscribe!</button>
-                                </form>
+                                </form> -->
                                 <!-- mailchimp-alerts Start -->
                                 <div class="mailchimp-alerts text-centre">
                                     <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
@@ -856,7 +881,7 @@
                 <div class="row align-items-center">
                     <div class="col-lg-6 col-md-6">
                         <div class="copyright_area">
-                            <p class="copyright-text">&copy; 2025 <a href="{% url 'index' %}">Junko</a>. Made with <i
+                            <p class="copyright-text">&copy; 2025 <a href="{% url 'index' %}">Philoshop</a>. Made with <i
                                     class="fa fa-heart text-danger"></i> by <a href="https://hasthemes.com/"
                                     target="_blank">HasThemes</a> </p>
                         </div>
@@ -872,12 +897,67 @@
     <!-- Plugins JS -->
     <script src="{% static 'assets/js/plugins.js' %}"></script>
 
+    <!-- JS (pour le carrousel) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Main JS -->
     <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+
 
     {% block script %}
     {% endblock script %}
+    <script>
+        $(document).ready(function(){
+            $(".owl-carousel").owlCarousel({
+                items: 4,
+                loop: true,
+                margin: 15,
+                nav: true,
+                dots: false,
+                autoplay: true,
+                autoplayTimeout: 3000,
+                responsive: {
+                0: { items: 1 },
+                576: { items: 2 },
+                768: { items: 3 },
+                992: { items: 4 }
+                }
+            });
+        });
 
+        $(document).ready(function(){
+            $(".owl-carousel").owlCarousel({
+            loop: true,
+            margin: 15,
+            nav: true,
+            dots: true,
+            autoplay: true,
+            autoplayTimeout: 5000,
+            responsive:{
+                0:{ items:1 },
+                576:{ items:2 },
+                768:{ items:3 },
+                992:{ items:4 }
+            }
+            });
+        });
+
+        $(document).ready(function(){
+            $('.product_carousel').owlCarousel({
+                loop: false,
+                margin: 10,
+                nav: true,
+                responsive: {
+                    0: { items: 1 },
+                    600: { items: 2 },
+                    1000: { items: 4 }
+                }
+            });
+        });
+
+    </script>
 
 </body>
 

@@ -38,37 +38,51 @@
                                         <tr>
                                             <th class="product_remove">Delete</th>
                                             <th class="product_thumb">Image</th>
-                                            <th class="product_name">Product</th>
-                                            <th class="product-price">Price</th>
-                                            <th class="product_quantity">Quantity</th>
+                                            <th class="product_name">Produit</th>
+                                            <th class="product-price">Prix</th>
+                                            <th class="product-price">Prix Promo</th>
+                                            <th class="product_quantity">Quantité</th>
                                             <th class="product_total">Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for item in panier_items %}
                                         <tr>
-                                            <td class="product_remove">
-                                                <a href="{% url 'supprimer_item' item.id %}">
-                                                    <i class="fa fa-trash-o"></i>
-                                                </a>
-                                            </td>
-                                            <td class="product_thumb">
-                                                <a href="#"><img src="{{ item.produit.image.url }}" alt=""></a>
-                                            </td>
-                                            <td class="product_name"><a href="#">{{ item.produit.nom }}</a></td>
-                                            <td class="product-price">{{ item.produit.prix }} XOF</td>
-                                            <td class="product_quantity">
-                                                <label>Quantity</label>
-                                                <input min="1" max="100" value="{{ item.quantite }}" type="number">
-                                            </td>
-                                            <td class="product_total">{{ item.total }} XOF</td>
+                                          <td class="product_remove">
+                                            <a href="{% url 'supprimer_item' item.id %}"><i class="fa fa-trash-o"></i></a>
+                                          </td>
+                                          <td class="product_thumb">
+                                            <a href="#"><img src="{{ item.produit.image.url }}" alt=""></a>
+                                          </td>
+                                          <td class="product_name"><a href="#">{{ item.produit.nom }}</a></td>
+                                      
+                                          <!-- Prix initial -->
+                                          <td class="product-price">
+                                            {{ item.produit.prix }} FCFA
+                                          </td>
+                                      
+                                          <!-- Prix promotionnel -->
+                                          <td class="product-price">
+                                            {% if item.produit.en_promotion and item.produit.prix_promo %}
+                                              <strong class="text-success">{{ item.produit.prix_promo }} FCFA</strong>
+                                            {% else %}
+                                              <span class="text-muted">-</span>
+                                            {% endif %}
+                                          </td>
+                                      
+                                          <td class="product_quantity">
+                                            <label>Quantité</label>
+                                            <input min="1" max="100" value="{{ item.quantite }}" type="number">
+                                          </td>
+                                          <td class="product_total">{{ item.total }} FCFA</td>
                                         </tr>
                                         {% empty %}
                                         <tr>
-                                            <td colspan="6">Votre panier est vide.</td>
+                                          <td colspan="7">Votre panier est vide.</td>
                                         </tr>
                                         {% endfor %}
-                                    </tbody>
+                                      </tbody>
+                                      
                                 </table>
                             </div>
                             <div class="cart_submit">
@@ -81,14 +95,7 @@
                 <div class="coupon_area">
                     <div class="row">
                         <div class="col-lg-6 col-md-6">
-                            <div class="coupon_code left">
-                                <h3>Coupon</h3>
-                                <div class="coupon_inner">
-                                    <p>Enter your coupon code if you have one.</p>
-                                    <input placeholder="Coupon code" type="text">
-                                    <button type="submit">Apply coupon</button>
-                                </div>
-                            </div>
+                           
                         </div>
                         <div class="col-lg-6 col-md-6">
                             <div class="coupon_code right">
@@ -96,20 +103,20 @@
                                 <div class="coupon_inner">
                                     <div class="cart_subtotal">
                                         <p>Subtotal</p>
-                                        <p class="cart_amount">{{ total }} XOF</p>
+                                        <p class="cart_amount">{{ total }} FCFA</p>
                                     </div>
                                     <div class="cart_subtotal ">
                                         <p>Shipping</p>
-                                        <p class="cart_amount"><span>Flat Rate:</span> 0 XOF</p>
+                                        <p class="cart_amount"><span>Flat Rate:</span> 0 FCFA</p>
                                     </div>
                                     <a href="#">Calculate shipping</a>
 
                                     <div class="cart_subtotal">
                                         <p>Total</p>
-                                        <p class="cart_amount">{{ total }} XOF</p>
+                                        <p class="cart_amount">{{ total }} FCFA</p>
                                     </div>
                                     <div class="checkout_btn">
-                                        <a href="#">Proceed to Checkout</a>
+                                        <a href="{% url "proceed-to-checkout" %}">Proceed to Checkout</a>
                                     </div>
                                 </div>
                             </div>

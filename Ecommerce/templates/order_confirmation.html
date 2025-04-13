@@ -1,0 +1,66 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Confirmation de la Commande</h2>
+    <p class="text-center">Merci pour votre commande !</p>
+
+    <div class="row">
+        <!-- Order Details -->
+        <div class="col-md-6">
+            <h4>Détails de la Commande</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in commande.items.all %}
+                    <tr>
+                        <td>{{ item.produit.nom }} × {{ item.quantite }}</td>
+                        <td>{{ item.item_total }} FCFA</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td><strong>Sous-total</strong></td>
+                        <td>{{ cart_subtotal }} FCFA</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Frais de Livraison</strong></td>
+                        <td>{{ shipping_cost }} FCFA</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Commande</strong></td>
+                        <td><strong>{{ order_total }} FCFA</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Billing Information -->
+        <div class="col-md-6">
+            <h4>Informations de Facturation</h4>
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Nom :</strong> {{ facture.utilisateur.prenom }} {{ facture.utilisateur.nom }}</li>
+                <li class="list-group-item"><strong>Email :</strong> {{ facture.utilisateur.email }}</li>
+                <li class="list-group-item"><strong>Adresse :</strong> {{ facture.utilisateur.adresse }}</li>
+                <li class="list-group-item"><strong>Ville :</strong> {{ facture.utilisateur.ville }}</li>
+                <li class="list-group-item"><strong>Statut de la commande :</strong> {{ facture.get_statut_display|default:facture.statut }}</li>
+                <li class="list-group-item"><strong>Date :</strong> {{ facture.date|date:"d/m/Y" }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="alert alert-success mt-4" role="alert">
+        Votre paiement a été effectué avec succès. Vous recevrez une confirmation par email dans les plus brefs délais.
+    </div>
+
+    <!-- Download Button -->
+    <a href="{% url 'download_invoice' commande_id=commande.id %}" class="btn btn-success mt-4">Télécharger la facture (PDF)</a>
+
+    <a href="{% url 'index' %}" class="btn btn-primary mt-4">Retour à l'accueil</a>
+</div>
+{% endblock %}

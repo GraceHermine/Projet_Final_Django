@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Détails du Paiement</h2>
+    <p class="text-center">Veuillez choisir votre méthode de paiement.</p>
+
+    <form method="POST" action="{% url 'payment' facture.id %}">
+        {% csrf_token %}
+    
+        <!-- Orange Money Option -->
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="payment_method" id="orange_money" value="orange_money" required>
+            <label class="form-check-label" for="orange_money">Orange Money</label>
+        </div>
+    
+        <!-- Wave Option -->
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="payment_method" id="wave" value="wave" required>
+            <label class="form-check-label" for="wave">Wave</label>
+        </div>
+    
+        <!-- Espèces Option (lors de la livraison) -->
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="payment_method" id="cash_on_delivery" value="cash_on_delivery" required>
+            <label class="form-check-label" for="cash_on_delivery">Espèces (lors de la livraison)</label>
+        </div>
+    
+        <!-- Order Total -->
+        <div class="form-group">
+            <label for="order_total">Montant Total de la Commande</label>
+            <input type="text" class="form-control" id="order_total" value="{{ facture.montant }} FCFA" disabled>
+        </div>
+    
+        <!-- Submit Button -->
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary btn-block">Confirmer le Paiement</button>
+        </div>
+    </form>
+    
+</div>
+{% endblock %}

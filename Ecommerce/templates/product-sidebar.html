@@ -16,7 +16,7 @@
                     <div class="breadcrumb_content">
                         <ul>
                             <li><a href="{% url 'index' %}">home</a></li>
-                            <li>product</li>
+                            <li> <a href="{% url 'shop' %}">product</a> </li>
                             <li>{{produit.nom}}</li>
                         </ul>
                     </div>
@@ -37,22 +37,21 @@
                             <div class="widget_list widget_categories">
                                 <h2>Product categories</h2>
                                 <ul>
-                                    <li><a href="#">Cameras & Camcoders</a></li>
-                                    <li class="widget_sub_categories"><a href="javascript:void(0)">Computer &
-                                            Networking</a>
-                                        <ul class="widget_dropdown_categories">
-                                            <li><a href="#">Computer</a></li>
-                                            <li><a href="#">Networking</a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="#">Games & Consoles</a></li>
-                                    <li><a href="#">Headphone & Speaker</a></li>
-                                    <li><a href="#">Movies & Video Games</a></li>
-                                    <li><a href="#">Smartphone</a> </li>
-                                    <li><a href="#">Uncategorized</a></li>
+                                    {% for categorie in categories %}
+                                        <li {% if categorie.sous_categories.all %}class="widget_sub_categories"{% endif %}>
+                                            <a href="{% url 'produit' categorie.id %}">{{ categorie.nom }}</a>
+                                            {% if categorie.sous_categories.all %}
+                                                <ul class="widget_dropdown_categories">
+                                                    {% for sous_categorie in categorie.sous_categories.all %}
+                                                        <li><a href="{% url 'produit' sous_categorie.id %}">{{ sous_categorie.nom }}</a></li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
                                 </ul>
                             </div>
-                            <div class="widget_list widget_filter">
+                            {% comment %} <div class="widget_list widget_filter">
                                 <h2>Filter by price</h2>
                                 <form action="#">
                                     <div id="slider-range"></div>
@@ -60,7 +59,7 @@
                                     <input type="text" name="text" id="amount" />
 
                                 </form>
-                            </div>
+                            </div> {% endcomment %}
                             <div class="widget_list">
                                 <h2>Compare Products</h2>
                                 <div class="recent_product_container">
@@ -88,8 +87,12 @@
                                                     </ul>
                                                 </div>
                                                 <div class="price_box">
-                                                    <span class="old_price">{{produit.prix}}XOF</span>
-                                                    <span class="current_price">{{produit.prix}}XOF</span>
+                                                    {% if produit.en_promotion %}
+                                                        <span class="old_price text-muted text-decoration-line-through me-2">{{ produit.prix|floatformat:0 }} FCFA</span>
+                                                        <span class="current_price fw-bold text-danger">{{ produit.prix_final|floatformat:0 }} FCFA</span>
+                                                    {% else %}
+                                                        <span class="current_price fw-bold text-danger">{{ produit.prix|floatformat:0 }} FCFA</span>
+                                                    {% endif %}
                                                 </div>
                                             </figcaption>
                                         </figure>
@@ -97,20 +100,12 @@
                                     {% endfor %}
                                 </div>
                             </div>
-                            <div class="widget_list tags_widget">
-                                <h2>Product tags</h2>
-                                <div class="tag_cloud">
-                                    <a href="#">blouse</a>
-                                    <a href="#">clothes</a>
-                                    <a href="#">fashion</a>
-                                    <a href="#">handbag</a>
-                                    <a href="#">laptop</a>
-                                </div>
-                            </div>
+                            
                         </div>
                     </aside>
                     <!--sidebar widget end-->
                 </div>
+                
                 <div class="col-lg-9 col-md-12">
                     <div class="product_right_sidebar">
                         <div class="row">
@@ -171,20 +166,25 @@
                                                 <li class="next"><a href="#"><i class="fa fa-angle-right"></i></a></li>
                                             </ul>
                                         </div>
-                                        <div class=" product_ratting">
+                                        <div class="product_ratting">
                                             <ul>
-                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                <li class="review"><a href="#"> (customer review ) </a></li>
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= note_moyenne|floatformat:0 %}
+                                                        <li><i class="fa fa-star"></i></li>
+                                                    {% else %}
+                                                        <li><i class="fa fa-star-o"></i></li> {# étoile vide #}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <li class="review"><a href="#"> ({{ total_avis }} avis) </a></li>
                                             </ul>
                                         </div>
                                         <div class="price_box">
-                                            <span class="current_price">{{produit.prix}}XOF</span>
-                                            <span class="old_price">{{produit.prix}}XOF</span>
-
+                                            {% if produit.en_promotion %}
+                                                <span class="old_price text-muted text-decoration-line-through me-2">{{ produit.prix|floatformat:0 }} FCFA</span>
+                                                <span class="current_price fw-bold text-danger">{{ produit.prix_final|floatformat:0 }} FCFA</span>
+                                            {% else %}
+                                                <span class="current_price fw-bold text-danger">{{ produit.prix|floatformat:0 }} FCFA</span>
+                                            {% endif %}
                                         </div>
                                         <div class="product_desc">
                                             <p>{{produit.description}} </p>
@@ -202,14 +202,14 @@
                                         <div class="product_variant quantity">
                                             <label>Quantité</label>
                                             <input min="1" max="100" name="quantite" value="1" type="number">
-                                            <button class="button" type="submit">Ajouter au panier</button>
+                                            <button class="button" type="submit"> <a href="{% url 'notfound' %}"></a>  Ajouter au panier</button>
                                         </div>
                                         <div class=" product_d_action">
                                             <ul>
                                                 {% if favoris == None %}
-                                                <li><a href="{% url "ajouter_favoris" produit.id %}" title="Add to wishlist">+ Add to Wishlist</a></li>
+                                                <li><a href="{% url 'ajouter_favoris' produit.id %}" title="Add to wishlist">+ Add to Wishlist</a></li>
                                                 {% else %}
-                                                <li><a href="{% url "supprimer_favoris" produit.id %}" title="Remove to wishlist">- Remove to Wishlist</a></li>
+                                                <li><a href="{% url 'supprimer_favoris' produit.id %}" title="Remove to wishlist">- Remove to Wishlist</a></li>
                                                 {% endif %}
                                                 <li><a href="#" title="Add to wishlist">+ Compare</a></li>
                                             </ul>
@@ -248,14 +248,7 @@
                                         <a class="active" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info"
                                             aria-selected="false">Description</a>
                                     </li>
-                                    <li>
-                                        <a data-bs-toggle="tab" href="#sheet" role="tab" aria-controls="sheet"
-                                            aria-selected="false">Specification</a>
-                                    </li>
-                                    <li>
-                                        <a data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews"
-                                            aria-selected="false">Reviews (1)</a>
-                                    </li>
+                                   
                                 </ul>
                             </div>
                             <div class="tab-content">
@@ -299,7 +292,8 @@
 
                                 <div class="tab-pane fade" id="reviews" role="tabpanel">
                                     <div class="reviews_wrapper">
-                                        <h2>1 review for Donec eu furniture</h2>
+                                        <h2>{{ total_avis }} avis pour {{ produit.nom }}</h2>
+                                        {% for avis in avis_list %}
                                         <div class="reviews_comment_box">
                                             <div class="comment_thmb">
                                                 <img src="{% static 'assets/img/blog/comment2.jpg' %}" alt="">
@@ -308,24 +302,28 @@
                                                 <div class="reviews_meta">
                                                     <div class="star_rating">
                                                         <ul>
-                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>
-                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>
-                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>
-                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>
-                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>
+                                                            {% for i in "12345" %}
+                                                                {% if forloop.counter <= avis.note %}
+                                                                    <li><i class="ion-ios-star"></i></li>
+                                                                {% else %}
+                                                                    <li><i class="ion-ios-star-outline"></i></li>
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         </ul>
                                                     </div>
-                                                    <p><strong>admin </strong>- September 12, 2022</p>
-                                                    <span>roadthemes</span>
+                                                    <p><strong>{{ avis.user.nom }} {{ avis.user.prenom }}</strong> - {{ avis.created_at|date:"d M Y" }}</p>
+                                                    <span>{{ avis.commentaire }}</span>
                                                 </div>
                                             </div>
-
                                         </div>
+                                        {% empty %}
+                                        <p>Aucun avis pour ce produit pour le moment.</p>
+                                        {% endfor %}
                                         <div class="comment_title">
                                             <h2>Add a review </h2>
                                             <p>Your email address will not be published. Required fields are marked </p>
                                         </div>
-                                        <div class="product_ratting mb-10">
+                                        {% comment %} <div class="product_ratting mb-10">
                                             <h3>Your rating</h3>
                                             <ul>
                                                 <li><a href="#"><i class="fa fa-star"></i></a></li>
@@ -334,26 +332,32 @@
                                                 <li><a href="#"><i class="fa fa-star"></i></a></li>
                                                 <li><a href="#"><i class="fa fa-star"></i></a></li>
                                             </ul>
-                                        </div>
+                                        </div> {% endcomment %}
                                         <div class="product_review_form">
-                                            <form action="#">
+                                            {% if user.is_authenticated %}
+                                            <form action="{% url 'ajouter_avis' produit.id %}" method="POST">
+                                                {% csrf_token %}
                                                 <div class="row">
                                                     <div class="col-12">
-                                                        <label for="review_comment">Your review </label>
-                                                        <textarea name="comment" id="review_comment"></textarea>
+                                                        <label for="review_comment">Votre avis</label>
+                                                        <textarea name="commentaire" id="review_comment" required></textarea>
                                                     </div>
-                                                    <div class="col-lg-6 col-md-6">
-                                                        <label for="author">Name</label>
-                                                        <input id="author" type="text">
-
-                                                    </div>
-                                                    <div class="col-lg-6 col-md-6">
-                                                        <label for="email">Email </label>
-                                                        <input id="email" type="text">
+                                                    <div class="col-12">
+                                                        <label for="note">Votre note</label>
+                                                        <select name="note" id="note" required class="form-control">
+                                                            <option value="5">★★★★★</option>
+                                                            <option value="4">★★★★☆</option>
+                                                            <option value="3">★★★☆☆</option>
+                                                            <option value="2">★★☆☆☆</option>
+                                                            <option value="1">★☆☆☆☆</option>
+                                                        </select>
                                                     </div>
                                                 </div>
-                                                <button type="submit">Submit</button>
+                                                <button type="submit">Soumettre</button>
                                             </form>
+                                            {% else %}
+                                            <p><a href="{% url 'login' %}">Connectez-vous</a> pour laisser un avis.</p>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -363,301 +367,109 @@
                     <!--product info end-->
 
                     <!--product area start-->
-                    <section class="product_area related_products">
-                        <div class="section_title">
-                            <h2>Related Products </h2>
-                        </div>
-                        <div class="product_carousel product_column4 owl-carousel">
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product1.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product2.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
+                    <section class="product_area related_products py-5">
+                        <div class="container">
+                            <div class="section_title text-center mb-4">
+                                <h2>Related Products</h2>
+                            </div>
+                            <div class="product_carousel product_column4 owl-carousel">
+                                {% for prod in menche %}
+                                <div class="item">
+                                    <div class="card h-100 d-flex flex-column border-0 shadow-sm">
+                                        <!-- Image fixe et bien dimensionnée -->
+                                        <div class="position-relative">
+                                            <a href="{% url 'produit' prod.id %}">
+                                                <div class="ratio ratio-4x3">
+                                                    <img src="{{ prod.image.url }}" class="card-img-top object-fit-cover" alt="{{ prod.nom }}">
+                                                </div>
+                                            </a>
+                                            <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                                                {% if user.is_authenticated %}
+                                                    {% if prod.id in favoris_ids %}
+                                                        <a href="{% url 'supprimer_favoris' prod.id %}" class="text-danger"><i class="fa fa-heart"></i></a>
+                                                    {% else %}
+                                                        <a href="{% url 'ajouter_favoris' prod.id %}" class="text-dark"><i class="fa fa-heart-o"></i></a>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <a href="{% url 'login' %}" class="text-muted"><i class="fa fa-heart-o"></i></a>
+                                                {% endif %}
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" class="text-muted">
+                                                    <i class="ion-ios-search-strong"></i>
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">Natus erro at congue
-                                                massa commodo sit</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product3.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product4.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
+                                        <!-- Contenu de la carte -->
+                                        <div class="card-body d-flex flex-column text-center">
+                                            <h5 class="card-title mb-2">{{ prod.nom }}</h5>
+                                            <div class="price_box mb-3">
+                                                <span class="current_price fw-bold text-danger">{{ prod.prix|floatformat:0 }} FCFA</span>
+                                            </div>
+                                            <div class="mt-auto">
+                                                <a href="{% url 'produit' prod.id %}" class="btn btn-outline-primary btn-sm">Voir le produit</a>
+                                            </div>
                                         </div>
                                     </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">Itaque earum velit
-                                                elementum</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product5.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product6.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">Mauris tincidunt eros
-                                                posuere placerat</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product7.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product8.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">Morbi ornare vestibulum
-                                                massa</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product9.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product10.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">Porro quisquam eget
-                                                feugiat pretium</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product11.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product12.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">Laudantium enim
-                                                fringilla dignissim ipsum primis</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product4.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product5.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
-                                        </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
-                                        </div>
-                                    </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">Natus erro at congue
-                                                massa commodo sit</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
+                                </div>
+                                {% empty %}
+                                <div class="item">
+                                    <p class="text-center">Aucun produit disponible.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </section>
                     <!--product area end-->
 
                     <!--product area start-->
-                    <section class="product_area upsell_products">
-                        <div class="section_title">
-                            <h2>Upsell Products </h2>
-                        </div>
-                        <div class="product_carousel product_column4 owl-carousel">
-                            <article class="single_product">
-                                <figure>
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product9.jpg' %}" alt=""></a>
-                                        <a class="secondary_img" href="{% url 'produit' produit.id %}"><img
-                                                src="{% static 'assets/img/product/product10.jpg' %}" alt=""></a>
-                                        <div class="label_product">
-                                            <span class="label_sale">sale</span>
+                    <section class="product_area related_products py-5">
+                        <div class="container">
+                            <div class="section_title text-center mb-4">
+                                <h2>Related Products</h2>
+                            </div>
+                            <div class="product_carousel product_column4 owl-carousel">
+                                {% for prod in cat_femme %}
+                                <div class="item">
+                                    <div class="card h-100 d-flex flex-column border-0 shadow-sm">
+                                        <!-- Image fixe et bien dimensionnée -->
+                                        <div class="position-relative">
+                                            <a href="{% url 'produit' prod.id %}">
+                                                <div class="ratio ratio-4x3">
+                                                    <img src="{{ prod.image.url }}" class="card-img-top object-fit-cover" alt="{{ prod.nom }}">
+                                                </div>
+                                            </a>
+                                            <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                                                {% if user.is_authenticated %}
+                                                    {% if prod.id in favoris_ids %}
+                                                        <a href="{% url 'supprimer_favoris' prod.id %}" class="text-danger"><i class="fa fa-heart"></i></a>
+                                                    {% else %}
+                                                        <a href="{% url 'ajouter_favoris' prod.id %}" class="text-dark"><i class="fa fa-heart-o"></i></a>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <a href="{% url 'login' %}" class="text-muted"><i class="fa fa-heart-o"></i></a>
+                                                {% endif %}
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" class="text-muted">
+                                                    <i class="ion-ios-search-strong"></i>
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="wishlist"><a href="wishlist.html" title="Add to Wishlist"><i
-                                                            class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                <li class="compare"><a href="#" title="compare"><span
-                                                            class="ion-levels"></span></a></li>
-                                                <li class="quick_button"><a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#modal_box" title="quick view"> <span
-                                                            class="ion-ios-search-strong"></span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="add_to_cart">
-                                            <a href="cart.html" title="add to cart">Add to cart</a>
+                                        <!-- Contenu de la carte -->
+                                        <div class="card-body d-flex flex-column text-center">
+                                            <h5 class="card-title mb-2">{{ prod.nom }}</h5>
+                                            <div class="price_box mb-3">
+                                                <span class="current_price fw-bold text-danger">{{ prod.prix|floatformat:0 }} FCFA</span>
+                                            </div>
+                                            <div class="mt-auto">
+                                                <a href="{% url 'produit' prod.id %}" class="btn btn-outline-primary btn-sm">Voir le produit</a>
+                                            </div>
                                         </div>
                                     </div>
-                                    <figcaption class="product_content">
-                                        <div class="price_box">
-                                            <span class="old_price">$86.00</span>
-                                            <span class="current_price">$79.00</span>
-                                        </div>
-                                        <h3 class="product_name"><a href="{% url 'produit' produit.id %}">Natus erro at congue
-                                                massa commodo sit</a></h3>
-                                    </figcaption>
-                                </figure>
-                            </article>
+                                </div>
+                                {% empty %}
+                                <div class="item">
+                                    <p class="text-center">Aucun produit disponible.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </section>
                     <!--product area end-->

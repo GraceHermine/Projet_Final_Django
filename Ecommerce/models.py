@@ -33,7 +33,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-
+# Il doit bouger hein
 class User(AbstractUser):
     
     username = None
@@ -117,19 +117,24 @@ class SousCategorie(models.Model):
         return self.nom
     
 
-
 class Produit(models.Model):
 
     class Meta:
         verbose_name = "Produit"
         verbose_name_plural = "Produits"
-   
+
     nom = models.CharField(max_length=255)
     description = models.TextField()
     prix = models.DecimalField(max_digits=10, decimal_places=2)
     quantite = models.PositiveIntegerField()
     image = models.ImageField(upload_to='produits/')
     souscategorie = models.ForeignKey(SousCategorie, on_delete=models.CASCADE, related_name="souscategorie_produit")
+   
+    pour_slider = models.BooleanField(default=False, verbose_name="Afficher dans le slider")
+    en_promotion = models.BooleanField(default=False, verbose_name="Produit en promotion")
+    prix_promo = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Prix promotionnel"
+    )
 
     statut = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -137,7 +142,24 @@ class Produit(models.Model):
 
     def __str__(self):
         return self.nom
+
+    def get_prix_affiche(self):
+        """Retourne le prix remisé s'il existe, sinon le prix normal"""
+        if self.en_promotion and self.prix_promo:
+            return self.prix_promo
+        return self.prix
     
+    @property
+    def reduction_percent(self):
+        if self.en_promotion and self.prix_promo:
+            return round(100 - (self.prix_promo / self.prix * 100))
+        return 0
+    
+    @property
+    def prix_final(self):
+        if self.en_promotion and self.prix_promo:
+            return self.prix_promo
+        return self.prix
 
 
 class Panier(models.Model):
@@ -174,6 +196,8 @@ class PanierItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated_at = models.DateTimeField(auto_now=True)
 
+    
+
     def __str__(self):
         return self.total
     
@@ -196,10 +220,27 @@ class Commande(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def total(self):
+        return sum(item.total_price for item in self.items.all())
+
     def __str__(self):
         return f"Commande {self.id} de {self.utilisateur.nom} {self.utilisateur.prenom}"
     
 
+class CommandeItem(models.Model):
+    commande = models.ForeignKey(Commande, on_delete=models.CASCADE, related_name="items")
+    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    quantite = models.PositiveIntegerField(default=1)
+    prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.quantite} x {self.produit.nom} (Commande {self.commande.id})"
+
+    @property
+    def total_price(self):
+        return self.quantite * self.prix_unitaire
+ 
 
 class Facture(models.Model):
 
@@ -278,7 +319,7 @@ class Favoris(models.Model):
     last_updated_at = models.DateTimeField(auto_now=True)
 
 
-
+# Il bouge aussi
 class Blog(models.Model):
 
     class Meta:
@@ -301,7 +342,7 @@ class Blog(models.Model):
         return self.titre
     
 
-
+# Il bouge aussi
 class Commentaire(models.Model):
 
     class Meta:
@@ -312,6 +353,7 @@ class Commentaire(models.Model):
     utilisateur = models.ForeignKey(User, on_delete=models.CASCADE)
     titre = models.CharField(max_length=255)
     contenu = models.TextField()
+    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, related_name="reponses")
 
     statut = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -505,6 +547,7 @@ class Propos(models.Model):
 
 class Equipe(models.Model):
 
+
     class Meta:
         verbose_name = "Notre équipe"
         verbose_name_plural = "Notre équipe"
@@ -521,3 +564,24 @@ class Equipe(models.Model):
 
     def __str__(self):
         return f"{self.nom} - {self.poste}"
+    
+
+
+class Temoignage(models.Model):
+
+    class Meta:
+        verbose_name = "Temoignage"
+        verbose_name_plural = "Temoignages"
+
+    nom = models.CharField(max_length=100)
+    fonction = models.CharField(max_length=100)
+    photo = models.ImageField(upload_to='temoignages/')
+    message = models.TextField()
+
+    statut = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.nom} - {self.fonction}"   
+    

@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User,Categorie,SousCategorie,Produit,Panier,PanierItem,Commande,Facture,Coupon,Expedition,Favoris,Blog,Commentaire,Tags,Paiement,Avis,Livreur,Faq,Politique,Conditions,Propos, Equipe
+from .models import User,Categorie,SousCategorie,Produit,Panier,PanierItem,Commande,Facture,Coupon,Expedition,Favoris,Blog,Commentaire,Tags,Paiement,Avis,Livreur,Faq,Politique,Conditions,Propos, Equipe, Temoignage
+from django.utils.html import format_html
 # Register your models here.
+
+
 
 class CustomUserAdmin(UserAdmin):
     model = User
@@ -85,37 +88,66 @@ _register(SousCategorie, SousCategorieAdmin)
 
 
 
-class ProduitAdmin(admin.ModelAdmin):
 
+class ProduitAdmin(admin.ModelAdmin):
     fieldsets = (
-            (None, {
-                'fields': ('nom', 'description', 'prix', 'quantite', 'image', 'souscategorie')
-            }),
-            ('Statut', {
-                'fields': ('statut',)
-            }),
-        )
-    list_display = ('nom', 'description', 'prix', 'quantite', 'souscategorie', 'statut')
-    list_filter = ('statut', 'souscategorie')
+        (None, {
+            'fields': ('nom', 'description', 'prix', 'prix_promo', 'quantite', 'image', 'souscategorie')
+        }),
+        ('Options', {
+            'fields': ('statut', 'pour_slider', 'en_promotion')
+        }),
+    )
+
+    list_display = (
+        'nom', 'souscategorie', 'prix', 'affiche_prix_promo', 
+        'quantite', 'statut', 'en_promotion', 'pour_slider', 'apercu_image'
+    )
+
+    list_filter = ('statut', 'souscategorie', 'en_promotion', 'pour_slider')
     search_fields = ('nom', 'description')
     ordering = ('nom',)
     list_per_page = 10
 
+    actions = ['active', 'desactive', 'mettre_en_promo', 'retirer_promo']
 
-    def active(self,request,queryset):
+    def affiche_prix_promo(self, obj):
+        if obj.en_promotion and obj.prix_promo:
+            return f"{obj.prix_promo} €"
+        return "-"
+    affiche_prix_promo.short_description = "Prix promo"
+
+    def apercu_image(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="50" height="50" style="object-fit:cover;"/>', obj.image.url)
+        return "-"
+    apercu_image.short_description = "Image"
+
+    def active(self, request, queryset):
         queryset.update(statut=True)
-        self.message_user(request, 'La selection a été activé avec succès')
-    active.short_description = 'Activer'
+        self.message_user(request, "Les produits sélectionnés ont été activés.")
+    active.short_description = "Activer"
 
     def desactive(self, request, queryset):
         queryset.update(statut=False)
-        self.message_user(request, 'La sélection a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
+        self.message_user(request, "Les produits sélectionnés ont été désactivés.")
+    desactive.short_description = "Désactiver"
+
+    def mettre_en_promo(self, request, queryset):
+        queryset.update(en_promotion=True)
+        self.message_user(request, "Les produits sont maintenant en promotion.")
+    mettre_en_promo.short_description = "Mettre en promotion"
+
+    def retirer_promo(self, request, queryset):
+        queryset.update(en_promotion=False, prix_promo=None)
+        self.message_user(request, "Les produits ne sont plus en promotion.")
+    retirer_promo.short_description = "Retirer de la promotion"
 
 def _register(model, admin_class):
     admin.site.register(model, admin_class)
 
 _register(Produit, ProduitAdmin)
+
 
 
 
@@ -681,7 +713,26 @@ _register(Equipe, EquipeAdmin)
 
 
 
+class TemoinAdmin(admin.ModelAdmin):
+    list_display = ('nom', 'fonction', 'photo', 'message', 'statut')
+    list_filter = ('statut',)
+    search_fields = ('nom', 'statut', 'fonction')
+    ordering = ('nom',)  
 
+    def active(self,request,queryset):
+        queryset.update(statut=True)
+        self.message_user(request, 'La question a été activé avec succès')
+    active.short_description = 'Activer'
+
+    def desactive(self, request, queryset):
+        queryset.update(statut=False)
+        self.message_user(request, 'La question a été désactiver avec succès')
+    desactive.short_description = 'Desactiver'
+
+def _register(model, admin_class):
+    admin.site.register(model, admin_class)
+
+_register(Temoignage, TemoinAdmin)
 
 
 admin.site.site_header = "Gestion E-commerce 🚀"

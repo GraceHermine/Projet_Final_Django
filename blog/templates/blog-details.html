@@ -131,62 +131,101 @@
             </div>
 
 
-
             <div class="comments_box">
-              <h3>{% if blog_commentaire_count >= 2 %}{{blog_commentaire_count}} Comments{% else %}Comment{% endif %}</h3>
-
+              <h3>
+                {% if blog_commentaire_count >= 2 %}
+                  {{ blog_commentaire_count }} Commentaires
+                {% else %}
+                  Commentaire
+                {% endif %}
+              </h3>
+            
               {% for commentaire in commentaires %}
-
-              <div class="comment_list">
-                <div class="comment_thumb">
-                  <img
-                    src="{% static 'assets/img/blog/comment3.png.jpg' %}"
-                    alt=""
-                  />
+              <div class="comment_list mb-4 p-3 border rounded shadow-sm">
+                <div class="d-flex align-items-start mb-3">
+                  <div class="comment_thumb me-3">
+                    <img src="{% static 'assets/img/blog/comment3.png.jpg' %}" alt="" class="rounded-circle" width="50" height="50" />
+                  </div>
+                  <div class="comment_content">
+                    <div class="comment_meta">
+                      <h5 class="mb-1">{{ commentaire.utilisateur.get_full_name }}</h5>
+                      <span class="text-muted">{{ commentaire.created_at|date:"F d, Y à H:i" }}</span>
+                      <strong class="d-block mt-2">{{ commentaire.titre }}</strong>
+                    </div>
+                    <p>{{ commentaire.contenu }}</p>
+                  </div>
                 </div>
-                <div class="comment_content">
-                  <div class="comment_meta">
-                    <h5>
-                      <a href="#">{{ commentaire.utilisateur.prenom }} {{ commentaire.utilisateur.nom }}</a>
-                    </h5>
-                    <span>{{ commentaire.created_at|date:"F d, Y à H:i" }}</span>
+            
+                <!-- Affichage des réponses sous le commentaire parent -->
+                <div class="reponses-container">
+                  {% for reponse in commentaire.reponses.all %}
+                  <div class="comment_list ms-4 mb-3 p-3 bg-light border-start border-3 border-primary rounded">
+                    <div class="d-flex align-items-start">
+                      <div class="comment_thumb me-3">
+                        <img src="{% static 'assets/img/blog/comment3.png.jpg' %}" alt="" class="rounded-circle" width="40" height="40" />
+                      </div>
+                      <div class="comment_content">
+                        <div class="comment_meta">
+                          <h6 class="mb-1">{{ reponse.utilisateur.get_full_name }}</h6>
+                          <span class="text-muted">{{ reponse.created_at|date:"F d, Y à H:i" }}</span>
+                          <strong class="d-block mt-2">{{ reponse.titre }}</strong>
+                        </div>
+                        <p>{{ reponse.contenu }}</p>
+                      </div>
+                    </div>
                   </div>
-                  <p>{{ commentaire.contenu }}</p>
-                  <div class="comment_reply">
-                    <a href="#">Répondre</a>
-                  </div>
+                  {% endfor %}
+                </div>
+            
+                <!-- Formulaire de réponse -->
+                <button onclick="document.getElementById('reply-form-{{ commentaire.id }}').style.display='block'" class="btn btn-sm btn-outline-secondary mt-2">Répondre</button>
+            
+                <div id="reply-form-{{ commentaire.id }}" class="mt-3" style="display: none;">
+                  <form method="post" action="{% url 'blog-detail' blog.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="parent_id" value="{{ commentaire.id }}">
+                    <div class="mb-2">
+                      <input type="text" name="titre" class="form-control" placeholder="Titre de votre réponse" required />
+                    </div>
+                    <div class="mb-2">
+                      <textarea name="comment" class="form-control" rows="3" placeholder="Votre réponse..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Envoyer</button>
+                  </form>
                 </div>
               </div>
               {% empty %}
-              <p>Aucun commentaire pour l’instant.</p>
+                <p>Aucun commentaire pour l’instant.</p>
               {% endfor %}
-              
             </div>
-            <div class="comments_form">
-              <h3>Leave a Reply</h3>
-              <p>
-                  Your email address will not be published. Required fields are
-                  marked *
-                </p>
+            
+            <!-- Formulaire principal pour ajouter un commentaire -->
+            <div class="comments_form mt-4">
+              <h3>Laisser un commentaire</h3>
+              <p>Votre adresse email ne sera pas publiée. Les champs requis sont indiqués *</p>
+            
               {% if user.is_authenticated %}
               <form method="post" action="{% url 'blog-detail' blog.id %}">
-                  {% csrf_token %}
-                  <div class="row">
-                    <div class="col-12">
-                      <label for="review_title">Titre</label>
-                      <input type="text" name="titre" id="review_title" required />
-                    </div>
-                    <div class="col-12">
-                      <label for="review_comment">Commentaire</label>
-                      <textarea name="comment" id="review_comment" required></textarea>
-                    </div>
-                  </div>
-                  <button class="button" type="submit">Post Comment</button>
-                </form>
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="review_title" class="form-label">Titre</label>
+                  <input type="text" name="titre" id="review_title" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                  <label for="review_comment" class="form-label">Commentaire</label>
+                  <textarea name="comment" id="review_comment" class="form-control" rows="4" required></textarea>
+                </div>
+                <button class="btn btn-primary" type="submit">Post Comment</button>
+              </form>
               {% else %}
-                <p>You must be <a href="{% url 'login' %}">logged in</a> to post a comment.</p>
+                <p>Vous devez être <a href="{% url 'login' %}">connecté(e)</a> pour commenter.</p>
               {% endif %}
             </div>
+            
+            
+            
+            
+            
           </div>
           <!--blog grid area start-->
         </div>
@@ -204,51 +243,17 @@
             
             <div class="widget_list comments">
               <h3>Recent Comments</h3>
-              <div class="post_wrapper">
-                <div class="post_thumb">
-                  <a href="blog-details.html">
-                    <img src="{% static 'assets/img/blog/comment2.png.jpg' %}" alt="" /></a>
+              {% for comment in commentaires %}
+                <div class="post_wrapper">
+                    <div class="post_thumb">
+                        <a href="{% url 'blog-detail' comment.blog.id %}"><img src="{% static 'assets/img/blog/comment2.png.jpg' %}" alt=""></a>
+                    </div>
+                    <div class="post_info">
+                        <span> <a href="#">{{comment.utilisateur.prenom}} {{comment.utilisateur.nom}}</a> dit :</span>
+                        <a href="{% url 'blog-detail' comment.blog.id %}">{{comment.contenu}}</a>
+                    </div>
                 </div>
-                <div class="post_info">
-                  <span> <a href="#">demo</a> says:</span>
-                  <a href="blog-details.html">Quisque semper nunc</a>
-                </div>
-              </div>
-              <div class="post_wrapper">
-                <div class="post_thumb">
-                  <a href="blog-details.html"><img src="{% static 'assets/img/blog/comment2.png.jpg' %}" alt=""/></a>
-                </div>
-                <div class="post_info">
-                  <span><a href="#">admin</a> says:</span>
-                  <a href="blog-details.html">Quisque orci porta...</a>
-                </div>
-              </div>
-              <div class="post_wrapper">
-                <div class="post_thumb">
-                  <a href="blog-details.html"
-                    ><img
-                      src="{% static 'assets/img/blog/comment2.png.jpg' %}"
-                      alt=""
-                  /></a>
-                </div>
-                <div class="post_info">
-                  <span><a href="#">demo</a> says:</span>
-                  <a href="blog-details.html">Quisque semper nunc</a>
-                </div>
-              </div>
-              <div class="post_wrapper">
-                <div class="post_thumb">
-                  <a href="blog-details.html"
-                    ><img
-                      src="{% static 'assets/img/blog/comment2.png.jpg' %}"
-                      alt=""
-                  /></a>
-                </div>
-                <div class="post_info">
-                  <span><a href="#">admin</a> says:</span>
-                  <a href="blog-details.html">Quisque semper nunc</a>
-                </div>
-              </div>
+                {% endfor %}
             </div>
 
             <div class="widget_list widget_post">
@@ -299,3 +304,25 @@
   <!--blog section area end-->
 
   {% endblock content %}
+
+  {% block script %}
+  <script>
+    // function showReplyForm(commentId) {
+    //   const form = document.getElementById('reply-form-' + commentId);
+    //   form.style.display = (form.style.display === 'none') ? 'block' : 'none';
+    // }
+
+    document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.reply-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const commentId = this.dataset.commentId;
+        const form = document.getElementById('reply-form-' + commentId);
+        if (form) {
+          form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+        }
+      });
+    });
+  });
+  </script>
+  {% endblock script %}
