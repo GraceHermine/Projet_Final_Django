@@ -1,85 +1,7 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
-from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import RegexValidator
-from django.contrib.auth.models import BaseUserManager
-
-class UserManager(BaseUserManager):
-    def create_superuser(self, email, password=None, **extra_fields):
-        """
-        Crée et retourne un superutilisateur avec un email.
-        """
-        if not email:
-            raise ValueError("L'email doit être défini")
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
-
-    def create_user(self, email, password=None, **extra_fields):
-        """
-        Crée un utilisateur normal avec un email.
-        """
-        if not email:
-            raise ValueError("L'email doit être défini")
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-
-# Il doit bouger hein
-class User(AbstractUser):
-    
-    username = None
-
-
-    groups = models.ManyToManyField(Group, related_name="ecommerce_users", blank=True)
-    user_permissions = models.ManyToManyField(Permission, related_name="ecommerce_user_permissions", blank=True)
-
-    class Meta:
-        verbose_name = "Utilisateur"
-        verbose_name_plural = "Utilisateurs"
-
-    class Gender(models.TextChoices):
-        MALE = "H", _("Homme")
-        FEMALE = "F", _("Femme")
-
-    nom = models.CharField(max_length=255)
-    prenom = models.CharField(max_length=255)
-    genre = models.CharField(max_length=1, choices=Gender.choices, null=True)
-    datenaiss = models.DateField(null=True)
-    numero = models.CharField(max_length=15, null=True, validators=[
-            RegexValidator(
-                regex=r"^225 \d{10}$",
-                message="Le numéro doit commencer par 225 et contenir exactement 8 chiffres après l'indicatif.",
-                code="invalid_phone_number"
-            )
-        ],
-        unique=True)
-    adresse = models.TextField(null=True)
-    photo = models.ImageField(upload_to='users/', blank=True, null=True)
-    email = models.EmailField(unique=True)
-    panier = models.OneToOneField('Panier', on_delete=models.SET_NULL, null=True, blank=True, related_name="utilisateur_panier")
-    
-
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    objects = UserManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nom', 'prenom']
-
-    def __str__(self):
-        return f"{self.prenom} {self.nom}"
-    
+from authentification.models import User
 
 
 class Categorie(models.Model):
@@ -89,6 +11,7 @@ class Categorie(models.Model):
 
     nom = models.CharField(max_length=255)
     description = models.TextField()
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='sous_categories')
 
     statut = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -211,6 +134,7 @@ class Commande(models.Model):
     
     prixtotal = models.DecimalField(max_digits=10, decimal_places=2)
     utilisateur = models.ForeignKey(User, on_delete=models.CASCADE)
+    
     inorder = models.BooleanField(default=False)
     accepted = models.BooleanField(default=False)
     deliver = models.BooleanField(default=False)
@@ -319,49 +243,7 @@ class Favoris(models.Model):
     last_updated_at = models.DateTimeField(auto_now=True)
 
 
-# Il bouge aussi
-class Blog(models.Model):
-
-    class Meta:
-        verbose_name = "Blog"
-        verbose_name_plural = "Blog"
-    
-    auteur = models.ForeignKey(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='blogs/', blank=True, null=True)
-    cartepublication = models.DateTimeField(auto_now_add=True)
-    titre = models.CharField(max_length=255)
-    description = models.TextField()
-    categorie = models.ForeignKey(Categorie, on_delete=models.CASCADE, related_name="categorie_blog")
-    contenu = CKEditor5Field('Text', config_name='extends')
-
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.titre
-    
-
-# Il bouge aussi
-class Commentaire(models.Model):
-
-    class Meta:
-        verbose_name = "Commentaire"
-        verbose_name_plural = "Commentaires"
-    
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
-    utilisateur = models.ForeignKey(User, on_delete=models.CASCADE)
-    titre = models.CharField(max_length=255)
-    contenu = models.TextField()
-    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, related_name="reponses")
-
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.titre
-    
+  
 
 
 class Tags(models.Model):
@@ -461,127 +343,3 @@ class Livreur(models.Model):
     def __str__(self):
         return self.nom
 
-
-class Faq(models.Model):
-    class Meta:
-        verbose_name = "Question"
-        verbose_name_plural = "Questions"
-
-    
-    question = models.TextField()
-    reponse = models.TextField()
-    
-
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.question
-
-
-class Politique(models.Model):
-
-    class Meta:
-        verbose_name = "Politique de confidentialité"
-        verbose_name_plural = "Politiques de confidentialité"
-
-    titre = models.CharField(max_length=255, default="Politique de confidentialité")
-    contenu = CKEditor5Field('Contenu')
-    
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    
-
-    def __str__(self):
-        return self.titre
-    
-
-
-class Conditions(models.Model):
-
-    class Meta:
-        verbose_name = "Condition d'utilisation"
-        verbose_name_plural = "Conditions d'utilisation"
-
-    titre = models.CharField(max_length=255, default="Conditions Générales d'Utilisation")
-    contenu = CKEditor5Field('Contenu')
-   
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-    
-
-    def __str__(self):
-        return self.titre
-    
-
-
-
-class Propos(models.Model):
-
-    class Meta:
-        verbose_name = "A propos de nous"
-        verbose_name_plural = "A propos de nous"
-
-    titre = models.CharField(max_length=255)
-    soustitre = models.CharField(max_length=255)
-    description = CKEditor5Field('description')
-    contenu = CKEditor5Field('Contenu')
-    image = models.ImageField(upload_to='about/principale/')
-    photo = models.ImageField(upload_to='about/secondaire/')
-    nom = models.CharField(max_length=255)
-    histore = CKEditor5Field('histoire')
-    portrait = models.ImageField(upload_to="about/propos/")
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.titre
-
-
-
-
-class Equipe(models.Model):
-
-
-    class Meta:
-        verbose_name = "Notre équipe"
-        verbose_name_plural = "Notre équipe"
-
-    nom = models.CharField(max_length=100)
-    poste = models.CharField(max_length=100)
-    telephone = models.CharField(max_length=20)
-    email = models.EmailField()
-    photo = models.ImageField(upload_to='about/equipe/')
-
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.nom} - {self.poste}"
-    
-
-
-class Temoignage(models.Model):
-
-    class Meta:
-        verbose_name = "Temoignage"
-        verbose_name_plural = "Temoignages"
-
-    nom = models.CharField(max_length=100)
-    fonction = models.CharField(max_length=100)
-    photo = models.ImageField(upload_to='temoignages/')
-    message = models.TextField()
-
-    statut = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.nom} - {self.fonction}"   
-    

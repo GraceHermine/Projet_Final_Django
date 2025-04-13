@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User,Categorie,SousCategorie,Produit,Panier,PanierItem,Commande,Facture,Coupon,Expedition,Favoris,Blog,Commentaire,Tags,Paiement,Avis,Livreur,Faq,Politique,Conditions,Propos, Equipe, Temoignage
+from .models import User,Categorie,SousCategorie,Produit,Panier,PanierItem,Commande,Facture,Coupon,Expedition,Favoris,Tags,Paiement,Avis,Livreur
 from django.utils.html import format_html
 # Register your models here.
 
@@ -11,8 +11,20 @@ class CustomUserAdmin(UserAdmin):
     list_display = ['email', 'nom', 'prenom', 'genre', 'datenaiss', 'numero', 'statut']
     search_fields = ['email', 'nom', 'prenom']
     ordering = ['email']
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('nom', 'prenom', 'genre', 'datenaiss', 'numero', 'adresse', 'photo', 'panier', 'statut')}),
+
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Informations personnelles', {'fields': ('nom', 'prenom', 'genre', 'datenaiss', 'numero', 'adresse', 'photo')}),
+        ('Autres infos', {'fields': ('panier', 'statut')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Dates importantes', {'fields': ('last_login',)}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'nom', 'prenom', 'genre', 'datenaiss', 'numero', 'adresse', 'photo', 'panier', 'statut', 'password1', 'password2', 'is_active', 'is_staff')}
+        ),
     )
 
 def _register(model, admin_class):
@@ -379,72 +391,6 @@ def _register(model, admin_class):
 _register(Favoris, FavorisAdmin)
 
 
-class BlogAdmin(admin.ModelAdmin):
-
-    fieldsets = (
-        (None, {
-            'fields': ('auteur', 'image', 'titre', 'description', 'categorie', 'contenu')
-        }),
-        ('Statut', {
-            'fields': ('statut',)
-        }),
-    )
-    list_display = ('titre', 'auteur', 'categorie', 'cartepublication', 'statut')
-    list_display_links = ('titre',)
-    list_filter = ('categorie', 'statut')
-    search_fields = ('titre', 'description', 'contenu')
-    ordering = ('-cartepublication',)
-    list_per_page = 10
-    date_hierarchy = 'cartepublication'
-
-    def active(self,request,queryset):
-        queryset.update(statut=True)
-        self.message_user(request, 'La selection a été activé avec succès')
-    active.short_description = 'Activer'
-
-    def desactive(self, request, queryset):
-        queryset.update(statut=False)
-        self.message_user(request, 'La sélection a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
-
-def _register(model, admin_class):
-    admin.site.register(model, admin_class)
-
-_register(Blog, BlogAdmin)
-
-
-
-class CommentaireAdmin(admin.ModelAdmin):
-
-    fieldsets = (
-        (None, {
-            'fields': ('blog', 'utilisateur', 'titre', 'contenu')
-        }),
-        ('Statut', {
-            'fields': ('statut',)
-        }),
-    )
-    list_display = ('blog', 'utilisateur', 'titre', 'statut')
-    list_filter = ('statut',)
-    search_fields = ('titre', 'contenu')
-    ordering = ('-created_at',)
-    list_per_page = 10
-
-    def active(self,request,queryset):
-        queryset.update(statut=True)
-        self.message_user(request, 'La selection a été activé avec succès')
-    active.short_description = 'Activer'
-
-    def desactive(self, request, queryset):
-        queryset.update(statut=False)
-        self.message_user(request, 'La sélection a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
-
-def _register(model, admin_class):
-    admin.site.register(model, admin_class)
-
-_register(Commentaire, CommentaireAdmin)
-
 
 
 class TagsAdmin(admin.ModelAdmin):
@@ -575,164 +521,6 @@ def _register(model, admin_class):
     admin.site.register(model, admin_class)
 
 _register(Livreur, LivreurAdmin)
-
-
-class FaqAdmin(admin.ModelAdmin):
-
-    fieldsets = (
-        (None, {
-            'fields': ('question', 'reponse')
-        }),
-        ('Statut', {
-            'fields': ('statut',)
-        }),
-    )
-    list_display = ('question','reponse', 'statut')
-    list_filter = ('statut',)
-    search_fields = ('question', 'statut')
-    ordering = ('question',)
-    list_per_page = 10
-
-    def active(self,request,queryset):
-        queryset.update(statut=True)
-        self.message_user(request, 'La question a été activé avec succès')
-    active.short_description = 'Activer'
-
-    def desactive(self, request, queryset):
-        queryset.update(statut=False)
-        self.message_user(request, 'La question a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
-
-def _register(model, admin_class):
-    admin.site.register(model, admin_class)
-
-_register(Faq, FaqAdmin)
-
-
-
-class PolitiqueAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'statut', 'last_updated_at')
-    list_filter = ('statut',)
-    search_fields = ('titre',)
-    ordering = ('-last_updated_at',)
-    list_per_page = 10
-    
-    def active(self,request,queryset):
-        queryset.update(statut=True)
-        self.message_user(request, 'La question a été activé avec succès')
-    active.short_description = 'Activer'
-
-    def desactive(self, request, queryset):
-        queryset.update(statut=False)
-        self.message_user(request, 'La question a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
-
-def _register(model, admin_class):
-    admin.site.register(model, admin_class)
-
-_register(Politique, PolitiqueAdmin)
-
-
-
-class ConditionsAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'statut', 'created_at')
-    search_fields = ('titre',)
-    list_filter = ('statut',)
-    ordering = ('-created_at',)
-
-    def active(self,request,queryset):
-        queryset.update(statut=True)
-        self.message_user(request, 'La question a été activé avec succès')
-    active.short_description = 'Activer'
-
-    def desactive(self, request, queryset):
-        queryset.update(statut=False)
-        self.message_user(request, 'La question a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
-
-def _register(model, admin_class):
-    admin.site.register(model, admin_class)
-
-_register(Conditions, ConditionsAdmin)
-
-
-
-class ProposAdmin(admin.ModelAdmin):
-
-    fieldsets = (
-        (None, {
-            'fields': ('titre', 'description', 'image', 'soustitre', 'contenu', 'photo', 'nom', 'histore',  'portrait', 'statut')
-        }),
-        ('Dates', {
-            'fields': ('created_at', 'last_updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
-    list_display = ('titre', 'soustitre', 'statut', 'created_at', 'last_updated_at')
-    list_filter = ('statut',)
-    search_fields = ('titre', 'soustitre')
-    ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'last_updated_at')
-
-    def active(self,request,queryset):
-        queryset.update(statut=True)
-        self.message_user(request, 'La question a été activé avec succès')
-    active.short_description = 'Activer'
-
-    def desactive(self, request, queryset):
-        queryset.update(statut=False)
-        self.message_user(request, 'La question a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
-
-def _register(model, admin_class):
-    admin.site.register(model, admin_class)
-
-_register(Propos, ProposAdmin)
-
-
-class EquipeAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'poste', 'statut')
-    list_filter = ('statut',)
-    search_fields = ('nom', 'poste', 'email')
-    ordering = ('nom',)  
-
-    def active(self,request,queryset):
-        queryset.update(statut=True)
-        self.message_user(request, 'La question a été activé avec succès')
-    active.short_description = 'Activer'
-
-    def desactive(self, request, queryset):
-        queryset.update(statut=False)
-        self.message_user(request, 'La question a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
-
-def _register(model, admin_class):
-    admin.site.register(model, admin_class)
-
-_register(Equipe, EquipeAdmin)
-
-
-
-class TemoinAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'fonction', 'photo', 'message', 'statut')
-    list_filter = ('statut',)
-    search_fields = ('nom', 'statut', 'fonction')
-    ordering = ('nom',)  
-
-    def active(self,request,queryset):
-        queryset.update(statut=True)
-        self.message_user(request, 'La question a été activé avec succès')
-    active.short_description = 'Activer'
-
-    def desactive(self, request, queryset):
-        queryset.update(statut=False)
-        self.message_user(request, 'La question a été désactiver avec succès')
-    desactive.short_description = 'Desactiver'
-
-def _register(model, admin_class):
-    admin.site.register(model, admin_class)
-
-_register(Temoignage, TemoinAdmin)
 
 
 admin.site.site_header = "Gestion E-commerce 🚀"

@@ -25,5 +25,7 @@ urlpatterns = [
     path('', include('Ecommerce.urls')),
     path('auth/', include('authentification.urls')),
     path('blog/', include('blog.urls')),
+    path('info/', include('siteinfo.urls')),
+    path('api/', include('api.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

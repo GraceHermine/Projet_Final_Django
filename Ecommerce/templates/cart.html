@@ -72,7 +72,10 @@
                                       
                                           <td class="product_quantity">
                                             <label>Quantité</label>
-                                            <input min="1" max="100" value="{{ item.quantite }}" type="number">
+                                            <form method="post" action="{% url 'update_quantite' item.id %}">
+                                                {% csrf_token %}
+                                                <input type="number" name="quantite" min="1" max="100" value="{{ item.quantite }}" onchange="this.form.submit()" />
+                                            </form>
                                           </td>
                                           <td class="product_total">{{ item.total }} FCFA</td>
                                         </tr>

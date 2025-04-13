@@ -44,6 +44,13 @@ INSTALLED_APPS = [
     'Ecommerce.apps.EcommerceConfig',
     'authentification.apps.AuthentificationConfig',
     'blog.apps.BlogConfig',
+    'siteinfo.apps.SiteinfoConfig',
+    'rest_framework',
+    'rest_framework.authtoken',       
+    'drf_yasg', 
+    'api.apps.ApiConfig',
+    'django_filters',
+
 ]
 
 MIDDLEWARE = [
@@ -72,6 +79,8 @@ TEMPLATES = [
                 'Ecommerce.context_processors.favoris_count',
                 'Ecommerce.context_processors.panier_context',
                 'Ecommerce.context_processors.commande_en_cours',
+                'Ecommerce.context_processors.categories_context',
+              
                 
             ],
         },
@@ -112,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'Ecommerce.auth_backend.EmailBackend',  # remplace "ton_app" par le nom de ton app
+    'authentification.auth_backend.EmailBackend',  # remplace "ton_app" par le nom de ton app
 ]
 
 
@@ -251,3 +260,41 @@ JAZZMIN_SETTINGS = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER='dedjeneg@gmail.com'
+EMAIL_HOST_PASSWORD='gyje wbyz umub btdj'
+DEFAULT_FROM_EMAIL="dedjeneg@gmail.com"
+
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticated',
+        
+    ],
+    
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+        
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+
+    'PAGE_SIZE': 100,
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+
+     
+}

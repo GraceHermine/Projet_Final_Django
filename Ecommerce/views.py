@@ -8,14 +8,17 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Prefetch, Avg, Count
 from .utils import generate_invoice_pdf
 from django.http import HttpResponse, HttpResponseForbidden
-from .models import Blog, Commentaire,Temoignage,Avis,Facture, Favoris, Panier, PanierItem, User, Produit, Faq, Politique, Conditions, Propos, Equipe,Categorie,Tags,SousCategorie,Commande,CommandeItem
+from .models import Avis,Facture, Favoris, Panier, PanierItem, Produit, Categorie,SousCategorie,Commande,CommandeItem,Coupon,Expedition
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from io import BytesIO
+from blog.models import Blog
+from siteinfo.models import Temoignage
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.conf import settings
 # Create your views here.
-
-
 
 
 
@@ -85,25 +88,9 @@ def index(request):
 
 
 
-# Début du about
-def about(request):
-
-    membres = Equipe.objects.filter(statut=True)
-    
-    propos = Propos.objects.filter(statut=True).first()
-    datas = {
-        
-        'propos': propos,
-        'membres': membres,
-    }
-
-    return render(request, 'about.html', datas)
-#  Fin du about
-
-# Debut du code du blog ainsi que le blog détail
 
 
-# Fin du blog & blog détail
+
 
 # Debut du code de la partie shop
 @login_required
@@ -294,26 +281,6 @@ def shop(request):
 # Fin de la partie shop
 
 
-def contact(request):
-    datas = {
-    
-
-    }
-    return render(request, 'contact.html', datas)
-
-def service(request):
-    conditions = Conditions.objects.filter(statut=True).order_by('created_at')
-    datas = {
-        'cond': conditions
-    }
-    return render(request, 'services.html', datas)
-
-def account(request):
-    datas = {
-
-    }
-    return render(request, 'my-account.html', datas)
-
 
 
 def wishlist(request):
@@ -323,19 +290,7 @@ def wishlist(request):
     }
     return render(request, 'wishlist.html', datas)
 
-def policy(request):
-    politique = Politique.objects.filter(statut=True).order_by('created_at')
-    
-    datas = {
-        'politique': politique
-    }
-    return render(request, 'privacy-policy.html', datas)
 
-def notfound(request):
-    datas = {
-
-    }
-    return render(request, '404.html', datas)
 
 def cart(request):
     if not request.user.is_authenticated:
@@ -377,8 +332,8 @@ def proceed_to_checkout(request):
         messages.error(request, "Votre panier est vide.")
         return redirect("cart")
 
-    total = sum(item.quantite * item.produit.prix for item in panier_items)
-
+    total = sum(item.quantite * item.produit.prix_final for item in panier_items)
+    
     commande = Commande.objects.create(
         utilisateur=request.user,
         prixtotal=total,
@@ -390,13 +345,15 @@ def proceed_to_checkout(request):
             commande=commande,
             produit=item.produit,
             quantite=item.quantite,
-            prix_unitaire=item.produit.prix,
+            prix_unitaire=item.produit.prix_final,
         )
         item.delete()
 
     panier.delete()
 
     return redirect("checkout", commande_id=commande.id)
+
+
 
 def checkout(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
@@ -414,13 +371,31 @@ def checkout(request, commande_id):
         numero = request.POST.get('numero')
         email = request.POST.get('email')
 
-        facture = Facture(
+        coupon_code = request.POST.get('coupon_code')
+        reduction = 0
+
+        if coupon_code:
+            coupon = Coupon.objects.filter(code=coupon_code, expiration__gte=timezone.now(), statut=True).first()
+            if coupon:
+                reduction = coupon.valeur
+                commande.prixtotal = commande.prixtotal * (1 - (reduction / 100))
+                coupon.commande = commande
+                coupon.save()
+            else:
+                messages.warning(request, "Code promo invalide ou expiré.")
+
+        total_commande = commande.prixtotal + shipping_cost
+
+        facture, created = Facture.objects.get_or_create(
             commande=commande,
-            utilisateur=request.user,
-            montant=total_commande,
-            statut='non_payée',
-            taxes=0,
+            defaults={
+                'utilisateur': request.user,
+                'montant': total_commande,
+                'statut': 'non_payée',
+                'taxes': 0,
+            }
         )
+
         facture.save()
 
         return redirect('payment', facture_id=facture.id)
@@ -436,6 +411,8 @@ def checkout(request, commande_id):
 @login_required
 def payment(request, facture_id):
     facture = get_object_or_404(Facture, id=facture_id)
+    pdf_buffer = generate_invoice_pdf(facture.commande, facture)
+    envoyer_facture_par_email(facture, facture.commande, pdf_buffer)
 
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
@@ -554,23 +531,53 @@ def download_invoice(request, commande_id):
 
     return response
 
-def faq(request):
-    faqs = Faq.objects.filter(statut=True).order_by('-created_at')
-
-    datas = {
-        'faqs': faqs
-    }
-    return render(request, 'faq.html', datas)
-
-def base(request):
-    categories = Categorie.objects.filter(statut=True).prefetch_related(
-        "categorie_souscategorie"
-    )
-
-    datas = {
-         "categories": categories,
-    }
-    return render(request, 'base.html', datas)
 
 
+def search(request):
+    query = request.GET.get("q", "")
+    produits = Produit.objects.filter(nom__icontains=query, statut=True)
+    datas = get_context_produits(request, produits)
+    datas["query"] = query
+    return render(request, "shop-right-sidebar.html", datas)
 
+
+def envoyer_facture_par_email(facture, commande, pdf_buffer):
+    subject = f"Confirmation de votre commande #{commande.id}"
+    message = render_to_string("facture.html", {
+        "utilisateur": facture.utilisateur,
+        "commande": commande,
+        "facture": facture,
+    })
+    email = EmailMessage(subject, message, to=[facture.utilisateur.email])
+    email.attach(f"facture_{commande.id}.pdf", pdf_buffer.getvalue(), "application/pdf")
+    email.content_subtype = "html"
+    email.send()
+
+
+
+@login_required
+def update_quantite(request, item_id):
+    item = get_object_or_404(PanierItem, id=item_id, panier__utilisateur=request.user)
+    if request.method == "POST":
+        quantite = int(request.POST.get("quantite", 1))
+        item.quantite = quantite
+        item.total = quantite * item.produit.prix_final
+        item.save()
+
+        # Mise à jour du panier
+        panier = item.panier
+        panier.prixTotal = sum(i.total for i in PanierItem.objects.filter(panier=panier))
+        panier.save()
+
+    return redirect("cart")
+
+
+
+@login_required
+def suivi_commande(request, commande_id):
+    commande = get_object_or_404(Commande, id=commande_id, utilisateur=request.user)
+    expedition = Expedition.objects.filter(commande=commande).first()
+    return render(request, 'suivi_commande.html', {
+        'commande': commande,
+        'expedition': expedition,
+    })

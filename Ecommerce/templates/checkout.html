@@ -76,7 +76,8 @@
             </div>
             <div class="checkout_form">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6">
+                    <!-- Colonne gauche : formulaire de facturation -->
+                    <div class="col-lg-7">
                         <form method="POST" action="{% url 'checkout' commande_id=commande.id %}">
                             {% csrf_token %}
                             <h3>Adresse de facturation</h3>
@@ -104,7 +105,7 @@
             
                                 <div class="col-12 mb-20">
                                     <label for="adresse_complement">Complément d'adresse</label>
-                                    <input type="text" name="adresse_complement" id="adresse_complement" placeholder="Appartement, suite, unité etc. (facultatif)">
+                                    <input type="text" name="adresse_complement" id="adresse_complement" placeholder="Appartement, suite, etc.">
                                 </div>
             
                                 <div class="col-12 mb-20">
@@ -122,74 +123,22 @@
                                     <input type="email" name="email" id="email" value="{{ form.email.value }}" required>
                                 </div>
             
-                                <div class="col-12 mb-20">
-                                    <input id="account" type="checkbox" data-bs-target="createp_account" />
-                                    <label for="account" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-controls="collapseOne">Créer un compte ?</label>
-                                    <div id="collapseOne" class="collapse one" data-bs-parent="#accordion">
-                                        <div class="card-body1">
-                                            <label>Mot de passe du compte <span>*</span></label>
-                                            <input placeholder="Mot de passe" type="password" name="password" required>
-                                        </div>
-                                    </div>
-                                </div>
-            
-                                <div class="col-12 mb-20">
-                                    <input id="address" type="checkbox" data-bs-target="createp_account" />
-                                    <label for="address" data-bs-toggle="collapse" data-bs-target="#collapsetwo" aria-controls="collapseOne">Expédier à une adresse différente ?</label>
-            
-                                    <div id="collapsetwo" class="collapse one" data-bs-parent="#accordion">
-                                        <div class="row">
-                                            <div class="col-lg-6 mb-20">
-                                                <label for="shipping_prenom">Prénom <span>*</span></label>
-                                                <input type="text" name="shipping_prenom" id="shipping_prenom">
-                                            </div>
-                                            <div class="col-lg-6 mb-20">
-                                                <label for="shipping_nom">Nom <span>*</span></label>
-                                                <input type="text" name="shipping_nom" id="shipping_nom">
-                                            </div>
-            
-                                            <div class="col-12 mb-20">
-                                                <label for="shipping_ville">Ville <span>*</span></label>
-                                                <select name="shipping_ville" id="shipping_ville" class="niceselect_option">
-                                                    <option value="Abidjan">Abidjan</option>
-                                                    <option value="Bonoua">Bonoua</option>
-                                                    <option value="Man">Man</option>
-                                                    <option value="Korhogo">Korhogo</option>
-                                                    <option value="Daloa">Daloa</option>
-                                                    <option value="Bassam">Bassam</option>
-                                                </select>
-                                            </div>
-            
-                                            <div class="col-12 mb-20">
-                                                <label for="shipping_adresse">Adresse</label>
-                                                <input type="text" name="shipping_adresse" id="shipping_adresse">
-                                            </div>
-            
-                                            <div class="col-12 mb-20">
-                                                <label for="shipping_quartier">Quartier</label>
-                                                <input type="text" name="shipping_quartier" id="shipping_quartier">
-                                            </div>
-            
-                                            <div class="col-12 mb-20">
-                                                <label for="shipping_numero">Numéro</label>
-                                                <input type="text" name="shipping_numero" id="shipping_numero">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-            
                                 <div class="col-12">
                                     <div class="order-notes">
                                         <label for="order_note">Notes sur la commande</label>
-                                        <textarea id="order_note" name="order_note" placeholder="Notes spéciales pour la livraison"></textarea>
+                                        <textarea id="order_note" name="order_note" placeholder="Instructions pour la livraison (facultatif)"></textarea>
                                     </div>
                                 </div>
                             </div>
+                    </div>
             
-                            <h3>Votre commande</h3>
+                    <!-- Colonne droite : Résumé de la commande -->
+                    <div class="col-lg-5">
+                        <div class="card shadow-sm p-4 bg-white">
+                            <h4 class="mb-3">Votre commande</h4>
                             <div class="order_table table-responsive">
-                                <table>
-                                    <thead>
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
                                         <tr>
                                             <th>Produit</th>
                                             <th>Total</th>
@@ -197,10 +146,10 @@
                                     </thead>
                                     <tbody>
                                         {% for item in items %}
-                                            <tr>
-                                                <td>{{ item.produit.nom }} <strong> × {{ item.quantite }}</strong></td>
-                                                <td>{{ commande.total }}  FCFA</td>
-                                            </tr>
+                                        <tr>
+                                            <td>{{ item.produit.nom }} × {{ item.quantite }}</td>
+                                            <td>{{ item.total_price }} FCFA</td>
+                                        </tr>
                                         {% endfor %}
                                     </tbody>
                                     <tfoot>
@@ -212,29 +161,33 @@
                                             <th>Livraison</th>
                                             <td>{{ shipping_cost }} FCFA</td>
                                         </tr>
-                                        <tr class="order_total">
-                                            <th>Total de la commande</th>
-                                            <td><strong>{{ total_commande  }} FCFA</strong></td>
+                                        <tr class="fw-bold">
+                                            <th>Total</th>
+                                            <td>{{ order_total }} FCFA</td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
+                            <div class="coupon_code mb-3">
+                                <h4>Code Promo</h4>
+                                <input type="text" class="form-control mb-2" name="coupon_code" placeholder="Entrez votre code promo">
+                            </div>
             
-                            <div class="payment_method">
-                                <div class="panel-default">
-                                    <input id="payment_method1" name="payment_method" type="radio" value="check" required/>
-                                    <label for="payment_method1">Paiement par chèque</label>
+                            <div class="payment_method mt-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" id="payment_method1" name="payment_method" type="radio" value="check" required>
+                                    <label class="form-check-label" for="payment_method1">Paiement à la livraison</label>
                                 </div>
-                                <div class="panel-default">
-                                    <input id="payment_method2" name="payment_method" type="radio" value="paypal" required/>
-                                    <label for="payment_method2">Paiement PayPal</label>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" id="payment_method2" name="payment_method" type="radio" value="paypal" required>
+                                    <label class="form-check-label" for="payment_method2">Paiement par money</label>
                                 </div>
                             </div>
             
-                            <div class="order_button">
-                                <button type="submit">Valider la commande</button>
+                            <div class="order_button mt-4">
+                                <button type="submit" class="btn btn-dark w-100">Valider la commande</button>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>

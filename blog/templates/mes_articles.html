@@ -1,0 +1,116 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Mes Articles</h2>
+    
+    {% if articles %}
+        <div class="row">
+            {% for article in articles %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-lg">
+                        {% if article.image %}
+                            <img src="{{ article.image.url }}" class="card-img-top" alt="Image de image">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Image par défaut">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ article.titre }}</h5>
+                            <p class="card-text text-muted">{{ article.description|truncatewords:20 }}</p>
+                            <p class="card-text"><strong>Publié :</strong> {{ article.date_de_publication }}</p>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editArticleModal{{ article.id }}">Modifier</button>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteArticleModal{{ article.id }}">Supprimer</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal de modification -->
+                <div class="modal fade" id="editArticleModal{{ article.id }}" tabindex="-1" aria-labelledby="editArticleLabel{{ article.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editArticleLabel{{ article.id }}">Modifier l'Article</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="{% url 'modifier_article' article.id %}" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="titre{{ article.id }}" class="form-label">Titre</label>
+                                        <input type="text" class="form-control" name="titre" id="titre{{ article.id }}" value="{{ article.titre }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="description{{ article.id }}" class="form-label">Résumé</label>
+                                        <textarea class="form-control" name="description" id="description{{ article.id }}" rows="3" required>{{ article.description }}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="contenu{{ article.id }}" class="form-label">Contenu</label>
+                                        <textarea class="form-control" name="contenu" id="contenu{{ article.id }}" rows="6" required>{{ article.contenu }}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="image{{ article.id }}" class="form-label">Image de image</label>
+                                        <input type="file" class="form-control" name="image" id="image{{ article.id }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="categorie{{ article.id }}" class="form-label">Catégorie</label>
+                                        <select class="form-select" name="categorie" id="categorie{{ article.id }}" required>
+                                            {% for categorie in categories %}
+                                                <option value="{{ categorie.id }}" {% if article.categorie_id == categorie %}selected{% endif %}>{{ categorie.nom }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tags</label>
+                                        <div class="d-flex flex-wrap">
+                                            {% for tag in tags %}
+                                                <div class="form-check me-3">
+                                                    <input class="form-check-input" type="checkbox" name="tags" value="{{ tag.id }}" id="tag{{ article.id }}_{{ tag.id }}" 
+                                                    {% if tag in article.tag_ids.all %}checked{% endif %}>
+                                                    <label class="form-check-label" for="tag{{ article.id }}_{{ tag.id }}">{{ tag.nom }}</label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" name="statut" id="statut{{ article.id }}" {% if article.statut %}checked{% endif %}>
+                                        <label class="form-check-label" for="statut{{ article.id }}">Article publié</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de confirmation de suppression -->
+                <div class="modal fade" id="deleteArticleModal{{ article.id }}" tabindex="-1" aria-labelledby="deleteArticleLabel{{ article.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteArticleLabel{{ article.id }}">Confirmer la suppression</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Êtes-vous sûr de vouloir supprimer l'article "<strong>{{ article.titre }}</strong>" ? Cette action est irréversible.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <a href="{% url 'supprimer_article' article.id %}" class="btn btn-danger">Supprimer</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">Vous n'avez encore publié aucun article.</div>
+    {% endif %}
+    <div class="col-lg-12 text-center mt-5">
+        <a href="{% url 'ajouter_article' %}" class="btn-default">Ajouter un article</a>
+    </div>
+</div>
+
+{% endblock content %}

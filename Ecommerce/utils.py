@@ -8,50 +8,45 @@ def generate_invoice_pdf(commande, facture):
     p = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
 
-    # Titre
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(100, height - 50, "Facture de Commande")
+    # En-tête
+    p.setFont("Helvetica-Bold", 18)
+    p.drawString(200, height - 50, "FACTURE DE COMMANDE")
 
-    # Informations de la facture
     p.setFont("Helvetica", 12)
-    p.drawString(100, height - 80, f"Numéro de commande : {commande.id}")
-    p.drawString(100, height - 100, f"Date : {facture.date.strftime('%d/%m/%Y')}")
-    p.drawString(100, height - 120, f"Client : {facture.utilisateur.prenom} {facture.utilisateur.nom}")
-    p.drawString(100, height - 140, f"Email : {facture.utilisateur.email}")
-    p.drawString(100, height - 160, f"Adresse : {facture.utilisateur.adresse}, {facture.utilisateur.ville}")
+    p.drawString(50, height - 100, f"N° Commande : {commande.id}")
+    p.drawString(50, height - 120, f"Client : {facture.utilisateur.prenom} {facture.utilisateur.nom}")
+    p.drawString(50, height - 140, f"Email : {facture.utilisateur.email}")
+    p.drawString(50, height - 160, f"Adresse : {facture.utilisateur.adresse}")
 
-    # Détails des articles
+    # Détails des produits
     p.setFont("Helvetica-Bold", 12)
-    p.drawString(100, height - 200, "Détails de la commande")
-    p.setFont("Helvetica", 10)
+    p.drawString(50, height - 200, "Détails")
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(50, height - 220, "Produit")
+    p.drawString(300, height - 220, "Quantité")
+    p.drawString(400, height - 220, "Total")
 
-    y = height - 220
-    cart_subtotal = 0
+    y = height - 240
+    p.setFont("Helvetica", 10)
+    total = 0
     for item in commande.items.all():
-        item_total = item.produit.prix * item.quantite
-        cart_subtotal += item_total
-        p.drawString(100, y, f"{item.produit.nom} x {item.quantite}")
+        item_total = item.quantite * item.prix_unitaire
+        total += item_total
+        p.drawString(50, y, item.produit.nom)
+        p.drawString(300, y, str(item.quantite))
         p.drawString(400, y, f"{item_total} FCFA")
         y -= 20
 
-    # Totaux
-    shipping_cost = 1500  # Doit correspondre à ta logique
-    order_total = cart_subtotal + shipping_cost
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(50, y - 20, "Sous-total :")
+    p.drawString(400, y - 20, f"{total} FCFA")
+    p.drawString(50, y - 40, "Frais de livraison :")
+    p.drawString(400, y - 40, "1500 FCFA")
+    p.drawString(50, y - 60, "Total :")
+    p.drawString(400, y - 60, f"{total + 1500} FCFA")
 
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(100, y - 20, "Sous-total :")
-    p.drawString(400, y - 20, f"{cart_subtotal} FCFA")
-    p.drawString(100, y - 40, "Frais de livraison :")
-    p.drawString(400, y - 40, f"{shipping_cost} FCFA")
-    p.drawString(100, y - 60, "Total :")
-    p.drawString(400, y - 60, f"{order_total} FCFA")
-
-    # Statut de paiement
-    p.drawString(100, y - 80, f"Statut : {facture.get_statut_display() if hasattr(facture, 'get_statut_display') else facture.statut}")
-
-    # Pied de page
-    p.setFont("Helvetica-Oblique", 10)
-    p.drawString(100, 50, "Merci pour votre achat !")
+    p.setFont("Helvetica-Oblique", 9)
+    p.drawString(50, 40, "Merci pour votre achat.")
 
     p.showPage()
     p.save()

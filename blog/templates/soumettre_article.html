@@ -1,0 +1,54 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<div class="container mt-5 mb-4">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4">Ajouter un Article</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="titre" class="form-label">Titre</label>
+                <input type="text" class="form-control" name="titre" id="titre" placeholder="Entrez le titre de l'article" required>
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">Image de Couverture</label>
+                <input type="file" class="form-control" name="image" id="image" accept="image/*" required class="article-img">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Résumé</label>
+                <textarea class="form-control" name="description" id="description" rows="4" placeholder="Entrez un résumé de l'article" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="contenu" class="form-label">Contenu</label>
+                <textarea class="form-control" name="contenu" id="contenu" rows="6" placeholder="Entrez le contenu de l'article" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="categorie_id" class="form-label">Catégorie</label>
+                <select class="form-select" name="categorie_id" id="categorie_id" required>
+                    <option value="">Sélectionnez une catégorie</option>
+                    {% for categorie in categories %}
+                        <option value="{{ categorie.id }}">{{ categorie.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tags</label>
+                <div class="d-flex flex-wrap">
+                    {% for tag in tags %}
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="checkbox" name="tag_ids" value="{{ tag.id }}" id="tag{{ tag.id }}">
+                            <label class="form-check-label" for="tag{{ tag.id }}">{{ tag.nom }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary">Soumettre</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

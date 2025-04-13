@@ -1,7 +1,7 @@
 # Ecommerce/context_processors.py
 
-from .models import Favoris, Panier, PanierItem, Commande
-
+from .models import Favoris, Panier, PanierItem, Commande, Categorie
+from blog.models import Blog
 def favoris_count(request):
     if request.user.is_authenticated:
         count = Favoris.objects.filter(utilisateur=request.user).count()
@@ -39,4 +39,13 @@ def commande_en_cours(request):
         commande = Commande.objects.filter(utilisateur=request.user, statut=True).first()
         return {'commande_id': commande.id if commande else None}
     return {}
+
+
+def categories_context(request):
+    categories = Categorie.objects.filter(statut=True)
+    return {
+        'categories': categories
+    }
+
+
 

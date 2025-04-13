@@ -91,33 +91,49 @@
     <!--shipping area end-->
 
     <!--banner area start-->
-    <div class="banner_area mb-40">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner1.jpg' %}" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner2.jpg' %}" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner3.jpg' %}" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="banner_area mb-4">
+      <div class="container">
+          <div class="row g-3 align-items-stretch">
+              <!-- Image gauche -->
+              <div class="col-md-3 d-flex">
+                  <div class="single_banner flex-fill d-flex align-items-center justify-content-center">
+                      <div class="banner_thumb w-100 h-100">
+                          <a href="{% url 'shop' %}">
+                              <img src="{% static 'assets/img/banner.jpeg' %}" class="img-fluid w-100 h-100 object-fit-cover" alt="Banner">
+                          </a>
+                      </div>
+                  </div>
+              </div>
+  
+              <!-- Vidéo centrale -->
+              <div class="col-md-6 d-flex">
+                  <div class="single_banner flex-fill d-flex align-items-center justify-content-center">
+                      <video
+                          src="{% static 'assets/img/video.mov' %}"
+                          class="w-100 h-100"
+                          muted
+                          loop
+                          autoplay
+                          style="object-fit: cover;"
+                      ></video>
+                  </div>
+              </div>
+  
+              <!-- Image droite -->
+              <div class="col-md-3 d-flex">
+                  <div class="single_banner flex-fill d-flex align-items-center justify-content-center">
+                      <div class="banner_thumb w-100 h-100">
+                          <a href="{% url 'shop' %}">
+                              <img src="{% static 'assets/img/promo.jpeg' %}" class="img-fluid w-100 h-100 object-fit-cover" alt="Promo">
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
     <!--banner area end-->
 
     <section class="product_area py-5 bg-light">
@@ -127,8 +143,8 @@
             <p class="text-muted fs-5">Ne rate pas les promos les plus chaudes de la semaine !</p>
           </div>
       
-          <div class="owl-carousel owl-theme">
-            {% for produit in produits_promo %}
+          <div class="owl-carousel produits_promo_carousel owl-theme">
+            {% for produit in produits_promo  %}
             <div class="item">
               <div class="card h-100 d-flex flex-column border-0 shadow-sm">
                 <!-- Image + actions -->
@@ -182,31 +198,39 @@
     
 
     <!--banner area start-->
-    <div class="banner_area mb-40">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6 col-md-6">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner4.jpg' %}" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="single_banner mb-30">
-                        <div class="banner_thumb">
-                            <a href="{% url 'shop' %}"><img src="{% static 'assets/img/bg/banner5.jpg' %}" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="banner_area mb-60">
+      <div class="container">
+          <div class="row g-3 align-items-stretch">
+              <div class="col-lg-6 col-md-6 d-flex">
+                  <div class="single_banner flex-fill d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <div class="banner_thumb w-100 h-100">
+                          <a href="{% url 'shop' %}">
+                              <img src="{% static 'assets/img/vid1.png' %}" class="img-fluid w-100 h-100 object-fit-cover" alt="">
+                          </a>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-lg-6 col-md-6 d-flex">
+                  <div class="single_banner flex-fill d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <div class="banner_thumb w-100 h-100">
+                          <a href="{% url 'shop' %}">
+                              <img src="{% static 'assets/img/vid2.jpeg' %}" class="img-fluid w-100 h-100 object-fit-cover" alt="">
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
     </div>
+  
+  
+  
+  
     <!--banner area end-->
 
     <!--top- category area start-->
     {% if produit_par_categorie_top %}
-    <section class="top_category_product mb-70">
+    <section class="top_category_product mb-60">
         <div class="container">
             <div class="row">
             <div class="col-lg-2 col-md-3">
@@ -258,7 +282,7 @@
     <!--top- category area end-->
 
     <!--featured product area start-->
-    <section class="featured_product_area mb-70">
+    <section class="featured_product_area mb-60">
         <div class="container">
           <div class="row">
             <div class="col-12">
@@ -270,7 +294,7 @@
       
           <div class="row featured_container featured_column3">
             {% for produit in produits %}
-            <div class="col-lg-4 d-flex">
+            <div class="col-lg-4 d-flex mb-40">
               <div class="card h-100 w-100 d-flex flex-column border-0 shadow-sm">
                 <!-- Image avec ratio fixe -->
                 <a href="{% url 'produit' produit.id %}" class="text-decoration-none">
@@ -369,26 +393,30 @@
     <!--product area end-->
 
     <!--banner area start-->
-    <div class="banner_area ">
-        <div class="container">
-            <div class="row g-3">
-                <div class="col-lg-8 col-md-2">
-                    <div class="single_banner h-50">
-                        <a href="{% url 'shop' %}" class="d-block h-100">
-                            <img src="{% static 'assets/img/affiche02.jpeg' %}" class="img-fluid w-100 h-100 object-fit-cover rounded shadow" alt="Affiche 02">
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-2">
-                    <div class="single_banner h-100">
-                        <a href="{% url 'shop' %}" class="d-block h-100">
-                            <img src="{% static 'assets/img/affiche03.jpeg' %}" class="img-fluid w-100 h-50 object-fit-cover rounded shadow" alt="Affiche 03">
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="banner_area mb-60">
+      <div class="container">
+          <div class="row g-3">
+              <!-- Bannière gauche -->
+              <div class="col-lg-8 col-md-6 d-flex">
+                  <div class="single_banner flex-fill" style="height: 250px;">
+                      <a href="{% url 'shop' %}" class="d-block h-100">
+                          <img src="{% static 'assets/img/affiche02.jpeg' %}" class="img-fluid w-100 h-100 object-fit-cover rounded shadow" alt="Affiche 02">
+                      </a>
+                  </div>
+              </div>
+  
+              <!-- Bannière droite -->
+              <div class="col-lg-4 col-md-6 d-flex">
+                  <div class="single_banner flex-fill" style="height: 250px;">
+                      <a href="{% url 'shop' %}" class="d-block h-100">
+                          <img src="{% static 'assets/img/affiche03.jpeg' %}" class="img-fluid w-100 h-100 object-fit-cover rounded shadow" alt="Affiche 03">
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
     
     <!--banner area end-->
 
@@ -489,7 +517,7 @@
       </div>
     </div>
 
-    <div class="owl-carousel owl-theme blog_carousel">
+    <div class="owl-carousel blogs_carousel owl-theme">
       {% for blog in blogs %}
       <div class="card shadow-sm border-0 rounded-4 overflow-hidden d-flex flex-column h-100" style="width: 100%; max-width: 300px; min-height: 450px;">
         <!-- Image -->
@@ -505,11 +533,11 @@
           </p>
 
           <h5 class="card-title fw-bold mb-3">
-            <a href="{% url 'blog-detail' blog.id %}" class="text-dark text-decoration-none">{{ blog.titre }}</a>
+            <a href="{% url 'blog-detail' blog.slug %}" class="text-dark text-decoration-none">{{ blog.titre }}</a>
           </h5>
 
           <div class="mt-auto">
-            <a href="{% url 'blog-detail' blog.id %}" class="btn btn-sm text-white" style="background-color: #f5af19;">Lire plus</a>
+            <a href="{% url 'blog-detail' blog.slug %}" class="btn btn-sm text-white" style="background-color: #f5af19;">Lire plus</a>
           </div>
         </div>
       </div>
@@ -523,4 +551,30 @@
     
     
     {% endblock content %}
+
+    {% block script %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const video = document.getElementById('fashionVideo');
+        const playBtn = document.getElementById('playButton');
+    
+        video.addEventListener('mouseenter', () => {
+          video.play();
+          playBtn.style.display = 'none';
+        });
+    
+        video.addEventListener('mouseleave', () => {
+          video.pause();
+          video.currentTime = 0;
+          playBtn.style.display = 'block';
+        });
+    
+        playBtn.addEventListener('click', () => {
+          video.play();
+          playBtn.style.display = 'none';
+        });
+      });
+    </script>
+    
+    {% endblock script %}
         
