@@ -28,7 +28,7 @@ def blog(request):
             Q(titre__icontains=query)
         )
 
-    paginator = Paginator(blogs, 10)  # 10 blogs par page
+    paginator = Paginator(blogs, 6)  # 10 blogs par page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -49,30 +49,29 @@ def blog(request):
     return render(request, 'blog.html', datas)
 
 def blog_detail(request, slug):
+    
     blog = get_object_or_404(Blog, slug=slug, statut=True)
 
     tags = Tags.objects.filter(statut=True)
     categories = Categorie.objects.all()
-    related_posts = Blog.objects.exclude(slug=slug).filter(statut=True)[:3]
+    related_posts = Blog.objects.filter(statut=True).order_by('-created_at')[:3]
 
     if request.method == "POST":
         if request.user.is_authenticated:
-            titre = request.POST.get("titre")
             contenu = request.POST.get("comment")
             parent_id = request.POST.get("parent_id")
             parent = Commentaire.objects.filter(id=parent_id).first() if parent_id else None
 
-            if titre and contenu:
+            if contenu and contenu:
                 Commentaire.objects.create(
                     blog=blog,
                     utilisateur=request.user,
-                    titre=titre,
                     contenu=contenu,
                     parent=parent,
                     statut=True
                 )
                 messages.success(request, "Votre commentaire a été ajouté.")
-                return redirect('blog-detail', blog_id=blog.id)
+                return redirect('blog_detail_page', slug=blog.slug)
             else:
                 messages.error(request, "Tous les champs sont obligatoires.")
 
@@ -91,8 +90,8 @@ def blog_detail(request, slug):
     return render(request, 'blog-details.html', datas)
 
 
+# DEBUT DE LA GESTION DES ARTICLES DEPUIS L'INTERFACE DU SITE
 # Soumission d’un article
-
 
 @login_required
 def soumettre_article(request):
@@ -121,7 +120,7 @@ def soumettre_article(request):
     return render(request, 'soumettre_article.html', {'categories': categories, 'tags': tags})
 
 
-# DEBUT DE LA GESTION DES ARTICLES DEPUIS L'INTERFACE DU SITE
+
 
 # Articles de l'utilisateur connecté
 @login_required
@@ -134,7 +133,7 @@ def mes_articles(request):
 # Page admin - articles en attente
 @staff_member_required
 def articles_en_attente(request):
-    articles = Blog.objects.filter(est_pulie=False, statut=True).order_by('-created_at')
+    articles = Blog.objects.filter(statut=False).order_by('-created_at')
     return render(request, 'articles_en_attente.html', {'articles': articles})
 
 # Action admin - valider un article
@@ -142,7 +141,7 @@ def articles_en_attente(request):
 def valider_article(request, slug):
     article = get_object_or_404(Blog, slug=slug)
     if request.method == 'POST':
-        article.est_pulie = True
+        article.statut = True
         article.save()
         return redirect('articles_en_attente')
     return redirect('articles_en_attente')

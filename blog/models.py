@@ -3,7 +3,7 @@ from django_ckeditor_5.fields import CKEditor5Field
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from Ecommerce.models import User, Categorie
-
+from django.urls import reverse
 # Create your models here.
 
 
@@ -28,6 +28,9 @@ class Blog(models.Model):
     statut = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated_at = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self):
+        return reverse('blog_detail_page', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
         if not self.slug:

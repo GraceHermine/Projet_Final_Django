@@ -4,12 +4,12 @@ from . import views
 
 urlpatterns = [
     path("blog/", views.blog, name="blog"),
-    path("blog/<slug:slug>/", views.blog_detail, name="blog-detail"),
+    path("blog/<slug:slug>/", views.blog_detail, name="blog_detail_page"),
     path('soumettre-article/', views.soumettre_article, name='soumettre_article'),
     path('mes-articles/', views.mes_articles, name='mes_articles'),
 
     # GESTION DES ARTICLES DU BLOG
-    path('articles-en-attente/', views.articles_en_attente, name='articles_en_attente'),
+    path('attente/', views.articles_en_attente, name='articles_en_attente'),
     path('valider-article/<slug:slug>/', views.valider_article, name='valider_article'),
     path("ajouter-article/", views.ajouter_article, name='ajouter_article'),
     path("mes-articles/", views.mes_articles, name='mes_articles'),

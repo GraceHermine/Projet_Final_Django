@@ -110,7 +110,7 @@
                       <article class="single_related">
                           <figure>
                               <div class="related_thumb">
-                                  <a href="{% url 'blog-detail' post.slug %}">
+                                  <a href="{% url 'blog_detail_page' post.slug %}">
                                       <img src="{{ post.image.url }}" alt="{{ post.titre }}" class="img-fluid rounded-3 shadow-sm">
                                   </a>
                               </div>
@@ -119,7 +119,7 @@
                                       <span class="author">By : <a href="#">{{ post.auteur }}</a> /</span>
                                       <span class="post_date">On : <a href="#">{{ post.cartepublication|date:"M d, Y" }}</a></span>
                                   </div>
-                                  <h4><a href="{% url 'blog-detail' post.slug %}">{{ post.titre }}</a></h4>
+                                  <h4><a href="{% url 'blog_detail_page' post.slug %}">{{ post.titre }}</a></h4>
                               </figcaption>
                           </figure>
                       </article>
@@ -132,7 +132,7 @@
 
 
             <div class="comments_box">
-              <h3>
+              <h3 class="fw-bold">
                 {% if blog_commentaire_count >= 2 %}
                   {{ blog_commentaire_count }} Commentaires
                 {% else %}
@@ -141,63 +141,79 @@
               </h3>
             
               {% for commentaire in commentaires %}
-              <div class="comment_list mb-4 p-3 border rounded shadow-sm">
-                <div class="d-flex align-items-start mb-3">
-                  <div class="comment_thumb me-3">
-                    <img src="{% static 'assets/img/blog/comment3.png.jpg' %}" alt="" class="rounded-circle" width="50" height="50" />
-                  </div>
-                  <div class="comment_content">
-                    <div class="comment_meta">
-                      <h5 class="mb-1">{{ commentaire.utilisateur.get_full_name }}</h5>
-                      <span class="text-muted">{{ commentaire.created_at|date:"F d, Y à H:i" }}</span>
-                      <strong class="d-block mt-2">{{ commentaire.titre }}</strong>
+              <div class="comment_list mb-4 p-3 rounded shadow-sm" style="background-color: #fdfdfd;">
+            
+                <div class="d-flex justify-content-between align-items-start">
+                  <!-- Partie gauche : avatar + contenu -->
+                  <div class="d-flex">
+                    <div class="comment_thumb me-3">
+                      <img src="{% static 'assets/img/blog/comment3.png.jpg' %}" alt="avatar" class="rounded-circle" width="50" height="50" />
                     </div>
-                    <p>{{ commentaire.contenu }}</p>
+                    <div class="comment_content">
+                      <div class="comment_meta">
+                        <h5 class="mb-1 fw-semibold">{{ commentaire.utilisateur.get_full_name }}</h5>
+                        <small class="text-muted">{{ commentaire.created_at|date:"d F Y à H:i" }}</small>
+                      </div>
+                      <p class="mt-2 mb-0">{{ commentaire.contenu }}</p>
+                    </div>
+                  </div>
+            
+                  <!-- Bouton répondre à droite -->
+                  <div>
+                    <button onclick="document.getElementById('reply-form-{{ commentaire.id }}').style.display='block'" class="btn btn-sm" style="color: white; background-color: #f5af19;">Répondre</button>
                   </div>
                 </div>
             
-                <!-- Affichage des réponses sous le commentaire parent -->
-                <div class="reponses-container">
+                <!-- Réponses -->
+                {% if commentaire.reponses.all %}
+                <div class="ms-4 mt-60">
+                  <button class="btn btn-sm mb-2" 
+                          style="background-color:rgb(239, 190, 84); color: white;"
+                          onclick="toggleReponses({{ commentaire.id }})"
+                          id="toggle-btn-{{ commentaire.id }}">
+                    Voir les réponses ({{ commentaire.reponses.count }})
+                  </button>
+                </div>
+
+                <div id="reponses-{{ commentaire.id }}" class="reponses-container mt-2 ms-4" style="display: none;">
                   {% for reponse in commentaire.reponses.all %}
-                  <div class="comment_list ms-4 mb-3 p-3 bg-light border-start border-3 border-primary rounded">
-                    <div class="d-flex align-items-start">
+                  <div class="comment_list mb-3 p-3 rounded shadow-sm" style="background-color: #fff9f2;">
+                    <div class="d-flex">
                       <div class="comment_thumb me-3">
-                        <img src="{% static 'assets/img/blog/comment3.png.jpg' %}" alt="" class="rounded-circle" width="40" height="40" />
+                        <img src="{% static 'assets/img/blog/comment3.png.jpg' %}" alt="avatar" class="rounded-circle" width="40" height="40" />
                       </div>
                       <div class="comment_content">
                         <div class="comment_meta">
                           <h6 class="mb-1">{{ reponse.utilisateur.get_full_name }}</h6>
-                          <span class="text-muted">{{ reponse.created_at|date:"F d, Y à H:i" }}</span>
-                          <strong class="d-block mt-2">{{ reponse.titre }}</strong>
+                          <small class="text-muted">{{ reponse.created_at|date:"d F Y à H:i" }}</small>
                         </div>
-                        <p>{{ reponse.contenu }}</p>
+                        <p class="mt-2 mb-0">{{ reponse.contenu }}</p>
                       </div>
                     </div>
                   </div>
                   {% endfor %}
                 </div>
+                {% endif %}
+
             
-                <!-- Formulaire de réponse -->
-                <button onclick="document.getElementById('reply-form-{{ commentaire.id }}').style.display='block'" class="btn btn-sm btn-outline-secondary mt-2">Répondre</button>
-            
+                <!-- Formulaire de réponse masqué -->
                 <div id="reply-form-{{ commentaire.id }}" class="mt-3" style="display: none;">
-                  <form method="post" action="{% url 'blog-detail' blog.slug %}">
+                  <form method="post" action="{% url 'blog_detail_page' blog.slug %}">
                     {% csrf_token %}
                     <input type="hidden" name="parent_id" value="{{ commentaire.id }}">
                     <div class="mb-2">
-                      <input type="text" name="titre" class="form-control" placeholder="Titre de votre réponse" required />
-                    </div>
-                    <div class="mb-2">
                       <textarea name="comment" class="form-control" rows="3" placeholder="Votre réponse..." required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-sm btn-outline-primary">Envoyer</button>
+                    <button type="submit" class="btn btn-sm" style="color: white; background-color: #f5af19;">Envoyer</button>
                   </form>
                 </div>
+            
               </div>
               {% empty %}
                 <p>Aucun commentaire pour l’instant.</p>
               {% endfor %}
             </div>
+            
             
             <!-- Formulaire principal pour ajouter un commentaire -->
             <div class="comments_form mt-4">
@@ -205,12 +221,9 @@
               <p>Votre adresse email ne sera pas publiée. Les champs requis sont indiqués *</p>
             
               {% if user.is_authenticated %}
-              <form method="post" action="{% url 'blog-detail' blog.slug %}">
+              <form method="post" action="{% url 'blog_detail_page' blog.slug %}">
                 {% csrf_token %}
-                <div class="mb-3">
-                  <label for="review_title" class="form-label">Titre</label>
-                  <input type="text" name="titre" id="review_title" class="form-control" required />
-                </div>
+                
                 <div class="mb-3">
                   <label for="review_comment" class="form-label">Commentaire</label>
                   <textarea name="comment" id="review_comment" class="form-control" rows="4" required></textarea>
@@ -221,10 +234,6 @@
                 <p>Vous devez être <a href="{% url 'login' %}">connecté(e)</a> pour commenter.</p>
               {% endif %}
             </div>
-            
-            
-            
-            
             
           </div>
           <!--blog grid area start-->
@@ -259,11 +268,11 @@
               {% for comment in commentaires %}
                 <div class="post_wrapper">
                     <div class="post_thumb">
-                        <a href="{% url 'blog-detail' comment.blog.slug %}"><img src="{% static 'assets/img/blog/comment2.png.jpg' %}" alt=""></a>
+                        <a href="{% url 'blog_detail_page' comment.blog.slug %}"><img src="{% static 'assets/img/blog/comment2.png.jpg' %}" alt=""></a>
                     </div>
                     <div class="post_info">
                         <span> <a href="#">{{comment.utilisateur.prenom}} {{comment.utilisateur.nom}}</a> dit :</span>
-                        <a href="{% url 'blog-detail' comment.blog.slug %}">{{comment.contenu}}</a>
+                        <a href="{% url 'blog_detail_page' comment.blog.slug %}">{{comment.contenu}}</a>
                     </div>
                 </div>
                 {% endfor %}
@@ -274,10 +283,10 @@
               {% for blog in recent_blogs %}
               <div class="post_wrapper">
                   <div class="post_thumb">
-                      <a href="{% url 'blog-detail' blog.slug %}"><img src="{{blog.image.url}}" alt=""></a>
+                      <a href="{% url 'blog_detail_page' blog.slug %}"><img src="{{blog.image.url}}" alt=""></a>
                   </div>
                   <div class="post_info">
-                      <h3><a href="{% url 'blog-detail' blog.slug %}">{{blog.titre}}</a></h3>
+                      <h3><a href="{% url 'blog_detail_page' blog.slug %}">{{blog.titre}}</a></h3>
                       <span>{{ blog.cartepublication|date:"M d, Y" }}</span>
                   </div>
               </div>
@@ -337,5 +346,19 @@
       });
     });
   });
+
+
+  function toggleReponses(commentId) {
+    const container = document.getElementById(`reponses-${commentId}`);
+    const btn = document.getElementById(`toggle-btn-${commentId}`);
+  
+    if (container.style.display === "none") {
+      container.style.display = "block";
+      btn.innerText = "Masquer les réponses";
+    } else {
+      container.style.display = "none";
+      btn.innerText = `Voir les réponses (${container.children.length})`;
+    }
+  }
   </script>
   {% endblock script %}

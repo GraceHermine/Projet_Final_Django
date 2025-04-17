@@ -533,11 +533,11 @@
           </p>
 
           <h5 class="card-title fw-bold mb-3">
-            <a href="{% url 'blog-detail' blog.slug %}" class="text-dark text-decoration-none">{{ blog.titre }}</a>
+            <a href="{% url 'blog_detail_page' blog.slug %}" class="text-dark text-decoration-none">{{ blog.titre }}</a>
           </h5>
 
           <div class="mt-auto">
-            <a href="{% url 'blog-detail' blog.slug %}" class="btn btn-sm text-white" style="background-color: #f5af19;">Lire plus</a>
+            <a href="{% url 'blog_detail_page' blog.slug %}" class="btn btn-sm text-white" style="background-color: #f5af19;">Lire plus</a>
           </div>
         </div>
       </div>

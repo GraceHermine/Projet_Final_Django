@@ -47,7 +47,7 @@ def register(request):
         send_mail(subject, message, email_from, [email], fail_silently=False)
 
         messages.success(request, 'Utilisateur enregistré avec succès !')
-        return redirect('index')  # Redirection vers la page de connexion
+        return redirect('login')  # Redirection vers la page de connexion
 
     return render(request, 'register.html')
 
